@@ -28,7 +28,7 @@
 
 \affil*[1]{\orgdiv{Department of Informatics Engineering, Faculty of Computer Science}, \orgname{Universitas Buana Perjuangan Karawang}, \orgaddress{\city{Karawang}, \country{Indonesia}}}
 
-\abstract{Hybrid quantum visual classifiers compress high-dimensional classical representations to a small number of circuit inputs, but conventional comparisons rarely separate information lost before the circuit from differences introduced by the decision head. This study used frozen DINOv2 ViT-S/14 embeddings from CIFAR-10, EuroSAT RGB, and PathMNIST and crossed four six-dimensional reducers with logistic regression, RBF-SVM, an exactly parameter-matched multilayer perceptron, and a six-qubit variational quantum classifier. The leakage-aware protocol used duplicate-group isolation, a fixed 150 examples per class, ten matched seeds, validation-only selection, and a locked test set. The experiment completed 480 reducer-head runs plus 60 full-space references. The validation-selected best configurations were cifar10: SLP6 + LR macro-F1 0.946 $\pm$ 0.003; eurosat: SLP6 + LR macro-F1 0.886 $\pm$ 0.006; pathmnist: SLP6 + RBF macro-F1 0.795 $\pm$ 0.026. Across evaluated conditions, the matched head gap was at least as large as the average absolute compression penalty. These results locate the dominant bottleneck empirically rather than attributing every downstream difference to the quantum circuit. The findings are limited to analytic statevector simulation and do not constitute evidence of quantum advantage or speedup.}
+\abstract{Hybrid quantum visual classifiers compress high-dimensional classical representations to a small number of circuit inputs, but conventional comparisons rarely separate information lost before the circuit from differences introduced by the decision head. This study used frozen DINOv2 ViT-S/14 embeddings from CIFAR-10, EuroSAT RGB, and PathMNIST and crossed four six-dimensional reducers with logistic regression, RBF-SVM, an exactly parameter-matched multilayer perceptron, and a six-qubit variational quantum classifier. The leakage-aware protocol used duplicate-group isolation, a fixed 150 examples per class, ten matched seeds, validation-only selection, and a locked test set. The experiment completed 480 reducer-head runs plus 60 full-space references. The validation-selected best configurations were CIFAR-10: SLP-6 + LR macro-F1 0.946 $\pm$ 0.003; EuroSAT: SLP-6 + LR macro-F1 0.886 $\pm$ 0.006; PathMNIST: SLP-6 + RBF-SVM macro-F1 0.795 $\pm$ 0.026. Across evaluated conditions, the matched head gap was at least as large as the average absolute compression penalty. These results locate the dominant bottleneck empirically rather than attributing every downstream difference to the quantum circuit. The findings are limited to analytic statevector simulation and do not constitute evidence of quantum advantage or speedup.}
 
 \keywords{quantum machine learning; DINOv2; representation compression; variational quantum classifier; transfer learning; calibration}
 
@@ -80,15 +80,15 @@ CIFAR-10 \citep{KRIZHEVSKY-2009}, EuroSAT RGB \citep{HELBER-2019}, and PathMNIST
 \centering
 \caption{Dataset audit and frozen split counts}\label{tab:2}
 \scriptsize
-\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\begin{tabular}{@{}lrrrrrr@{}}
 \toprule
-\textbf{Dataset} & \textbf{Decoded} & \textbf{Duplicate groups} & \textbf{Quarantined} & \textbf{Train} & \textbf{Validation} & \textbf{Test} \\
+\textbf{Dataset} & \textbf{Decoded} & \textbf{\shortstack{Duplicate\\groups}} & \textbf{Quarantined} & \textbf{Train} & \textbf{Validation} & \textbf{Test} \\
 \midrule
 cifar10 & 60000 & 9 & 10 & 44995 & 5000 & 9995 \\
 eurosat & 27000 & 5 & 0 & 18900 & 4050 & 4050 \\
 pathmnist & 107180 & 3 & 9 & 89991 & 10001 & 7179 \\
 \bottomrule
-\end{tabularx}
+\end{tabular}
 \end{table*}
 
 \begin{figure*}[htbp]
