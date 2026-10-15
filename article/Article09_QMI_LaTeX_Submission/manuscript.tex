@@ -1,0 +1,385 @@
+% Prepared with the official Springer Nature December 2024 template package.
+
+\documentclass[pdflatex,sn-mathphys-ay]{sn-jnl}
+
+\usepackage{graphicx}
+
+\usepackage{amsmath,amssymb,amsfonts}
+
+\usepackage{booktabs}
+
+\usepackage{tabularx}
+
+\usepackage{longtable}
+
+\usepackage{array}
+
+\usepackage{url}
+
+\raggedbottom
+
+\begin{document}
+
+\title[Representation Compression and Quantum-Head Effects]{Disentangling Representation Compression and Quantum-Head Effects in Multi-Domain Quantum Transfer Learning}
+
+\author*[1]{\fnm{Fajri Yanuar Shiddiq} \sur{Juanda}\orcid{https://orcid.org/0009-0007-8894-0265}}\email{fajriyanuar1@gmail.com}
+
+\author[1]{\fnm{Kiki Ahmad} \sur{Baihaqi}\orcid{https://orcid.org/0000-0002-2430-9235}}\email{kikiahmad@ubpkarawang.ac.id}
+
+\affil*[1]{\orgdiv{Department of Informatics Engineering, Faculty of Computer Science}, \orgname{Universitas Buana Perjuangan Karawang}, \orgaddress{\city{Karawang}, \country{Indonesia}}}
+
+\abstract{Hybrid quantum visual classifiers compress high-dimensional classical representations to a small number of circuit inputs, but conventional comparisons rarely separate information lost before the circuit from differences introduced by the decision head. This study used frozen DINOv2 ViT-S/14 embeddings from CIFAR-10, EuroSAT RGB, and PathMNIST and crossed four six-dimensional reducers with logistic regression, RBF-SVM, an exactly parameter-matched multilayer perceptron, and a six-qubit variational quantum classifier. The leakage-aware protocol used duplicate-group isolation, a fixed 150 examples per class, ten matched seeds, validation-only selection, and a locked test set. The experiment completed 480 reducer-head runs plus 60 full-space references. The validation-selected best configurations were cifar10: SLP6 + LR macro-F1 0.946 $\pm$ 0.003; eurosat: SLP6 + LR macro-F1 0.886 $\pm$ 0.006; pathmnist: SLP6 + RBF macro-F1 0.795 $\pm$ 0.026. Across evaluated conditions, the matched head gap was at least as large as the average absolute compression penalty. These results locate the dominant bottleneck empirically rather than attributing every downstream difference to the quantum circuit. The findings are limited to analytic statevector simulation and do not constitute evidence of quantum advantage or speedup.}
+
+\keywords{quantum machine learning; DINOv2; representation compression; variational quantum classifier; transfer learning; calibration}
+
+\maketitle
+
+\section{Introduction}
+
+Quantum transfer learning typically places a low-qubit variational circuit after a classical visual encoder. The apparent simplicity hides two distinct sources of error: the classical-to-quantum bottleneck can discard discriminative structure, while the decision head can fail to exploit what remains. Comparing a high-dimensional classical baseline with a compressed quantum model therefore confounds representation quality and classifier behavior.
+
+
+Recent work has established quantum feature spaces, variational learning, data re-uploading, and hybrid transfer-learning architectures \citep{SCHULD-KILLORAN-2019,HAVLICEK-2019,PEREZ-SALINAS-2020,MARI-2020,ABBAS-2021,CEREZO-VQA-2021,CEREZO-CHALLENGES-2022}. Encoding design can change the function family available to a variational model \citep{SCHULD-SWEKE-MEYER-2021}, while trainability and finite-data generalization remain separate concerns \citep{DU-2021,CARO-2022,GIL-FUSTER-2024}. In parallel, self-supervised encoders have made frozen representations increasingly transferable \citep{DINOV2-2024}, making it possible to control the encoder while studying the downstream bottleneck. However, a fair comparison must give classical and quantum heads the same samples, splits, six-dimensional vectors, selection criterion, and seed schedule.
+
+
+Empirical QML studies increasingly emphasize strong classical baselines and explicit accounting for preprocessing. Classical access to data can make conventional learners highly competitive even when quantum representations appear difficult to simulate \citep{HUANG-2021}. QMI benchmarks likewise show that hyperparameters and classical components can dominate observed behavior \citep{EGGINGER-2024,SCHNABEL-ROTH-2025}, while application studies illustrate both the promise and the limits of compressed quantum classifiers \citep{MANGINI-2022,WANG-2025}. Most directly, recent work on learned reduced representations confirms that dimensionality reduction deserves treatment as an experimental factor rather than an incidental preprocessing step \citep{ODAGIU-2025}.
+
+
+The present study differs from prior reduction-focused QML work in three respects. First, every reducer is crossed with four predictive heads, so the representation and classifier are estimated as separate experimental factors. Second, the VQC is compared with a parameter-matched MLP on identical vectors rather than only with an unconstrained high-dimensional baseline. Third, the analysis is repeated across three visual domains with paired ten-seed inference, full-space references, and calibration diagnostics. This design turns the usual end-to-end leaderboard into an attribution study of where performance is lost.
+
+
+This study asks whether compression or the quantum head is the larger bottleneck. Its contribution is a controlled reducer-by-head factorial benchmark across general-object, remote-sensing, and histopathology domains. The design combines a frozen 384D DINOv2 representation, four reducers at an identical 6D budget, exact parameter parity between the MLP and VQC, full-space references, representation-geometry diagnostics, calibration metrics, and paired multi-seed statistics.
+
+
+\begin{table*}[htbp]
+\centering
+\caption{Related methodological streams and the controls used in this study}\label{tab:1}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Research stream} & \textbf{Typical design} & \textbf{Unresolved issue} & \textbf{Control in this study} \\
+\midrule
+Quantum feature spaces and encodings \citep{SCHULD-KILLORAN-2019,SCHULD-SWEKE-MEYER-2021} & Quantum kernel or circuit & Representation quality may vary & Identical six-dimensional input \\
+Hybrid transfer learning \citep{MARI-2020,MANGINI-2022} & Classical encoder plus quantum head & Encoder and head effects can be confounded & Frozen DINOv2 for every condition \\
+Reduced quantum representations \citep{ODAGIU-2025} & Reducer followed by a quantum classifier & Reducer and classifier are rarely crossed factorially & Four reducers crossed with four heads \\
+QML benchmarking \citep{EGGINGER-2024,SCHNABEL-ROTH-2025} & Hyperparameter-sensitive comparison & Classical components may dominate & Matched data, selection, seeds, and capacity \\
+Model calibration \citep{GUO-2017,GNEITING-RAFTERY-2007} & Confidence quality after training & Often omitted in QML comparisons & ECE, NLL, and Brier score \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\section{Materials and Methods}
+
+\subsection{Datasets and leakage audit}
+
+CIFAR-10 \citep{KRIZHEVSKY-2009}, EuroSAT RGB \citep{HELBER-2019}, and PathMNIST \citep{MEDMNIST-2023} provide ten, ten, and nine classes. Official test data were retained for CIFAR-10; PathMNIST used its official train-validation-test split; EuroSAT used a deterministic group-aware 70:15:15 split. Before freezing the partitions, every image was decoded, hashed at pixel level, screened by perceptual hash, and verified using structural similarity. Exact or confirmed near-duplicate groups were indivisible. Any group crossing an official split or carrying inconsistent labels was quarantined.
+
+
+\begin{table*}[htbp]
+\centering
+\caption{Dataset audit and frozen split counts}\label{tab:2}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Dataset} & \textbf{Decoded} & \textbf{Duplicate groups} & \textbf{Quarantined} & \textbf{Train} & \textbf{Validation} & \textbf{Test} \\
+\midrule
+cifar10 & 60000 & 9 & 10 & 44995 & 5000 & 9995 \\
+eurosat & 27000 & 5 & 0 & 18900 & 4050 & 4050 \\
+pathmnist & 107180 & 3 & 9 & 89991 & 10001 & 7179 \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=0.98\textwidth]{Fig1.png}
+\caption{Representative samples generated by the reproducible analysis notebook}\label{fig:1}
+\end{figure*}
+
+\subsection{Frozen representation and compression}
+
+Every image was converted to RGB, resized deterministically to 224 by 224 pixels using bicubic interpolation, normalized with ImageNet statistics, and processed once by frozen DINOv2 ViT-S/14 \citep{DINOV2-2024}. The 384D normalized CLS token was cached as float32. No image augmentation or encoder fine-tuning was used, ensuring that the only experimental factor before classification was the reducer.
+
+
+PCA-6 represented unsupervised variance preservation; LDA-6 represented supervised linear discrimination; NCA-6 represented supervised metric learning \citep{GOLDBERGER-2004}; and SLP-6 used a learned 384-to-6 tanh bottleneck whose temporary classification layer was discarded. Each reducer was fitted on training data only. A second training-fitted standardizer mapped every reduced coordinate to an angle-compatible range.
+
+
+\begin{equation}\tilde{x}_j=\pi\tanh(z_j)\label{eq:angle-scaling}\end{equation}
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=0.98\textwidth]{Fig2.png}
+\caption{Controlled reducer-by-head factorial design; editable source prepared in draw.io}\label{fig:2}
+\end{figure*}
+
+\subsection{Classical and quantum heads}
+
+All four heads received exactly the same scaled six-dimensional vectors. Logistic regression and RBF-SVM provided linear and nonlinear classical references. The MLP comprised a bias-free 6-to-6 hidden layer, tanh activation, and a 6-to-C output layer. The VQC used six qubits and two data-reuploading layers; each layer applied RY input encoding, one trainable Rot gate per qubit, and ring CNOT entanglement before six Pauli-Z expectation values were passed to a 6-to-C linear output.
+
+
+\begin{equation}P_{\mathrm{VQC}}=6\times3\times2+6C+C=36+7C\label{eq:capacity}\end{equation}
+
+The MLP parameter count is 6 x 6 + 6C + C, exactly matching the VQC at 106 trainable parameters for ten-class datasets and 99 for PathMNIST. This parity prevents model capacity from becoming an uncontrolled explanation for a classical-quantum difference.
+
+
+\subsection{Selection, test isolation, and statistics}
+
+Each final seed selected a stratified 150 examples per class from training data, while a single balanced validation set contained 100 examples per class. Hyperparameters were selected with pilot seed 2026 by validation macro-F1, with validation negative log-likelihood as tie-breaker. The selected settings and data hashes were frozen before any test-label access. Final seeds were 11, 22, 33, 44, 55, 66, 77, 88, 99, and 111.
+
+
+Macro-F1 was the primary endpoint. Secondary endpoints were balanced accuracy, accuracy, MCC, macro precision and recall, one-vs-rest macro ROC-AUC, NLL, expected calibration error, multiclass Brier score, fit time, and inference time. Reducer effects were tested with Friedman tests followed by planned Wilcoxon signed-rank comparisons and Holm correction \citep{DEMSAR-2006,HOLM-1979}. Paired model gaps and compression penalties used 10,000 bootstrap resamples over seed differences \citep{EFRON-TIBSHIRANI-1993}. Datasets were summarized separately rather than pooled as pseudo-independent replicates.
+
+
+\begin{equation}\Delta_{\mathrm{compression}}(r)=F1_{\mathrm{RBF},384}-F1_{\mathrm{RBF},6,r}\label{eq:compression}\end{equation}
+
+\begin{equation}\Delta_{\mathrm{VQC-MLP}}(r)=F1_{\mathrm{VQC},r}-F1_{\mathrm{MLP},r}\label{eq:head-gap}\end{equation}
+
+\section{Results}
+
+All reported test values were produced after validation-only selection and protocol freezing. Table 3 summarizes the mean and standard deviation across the ten matched seeds. Figure 3 exposes interactions between reducer and head that would be hidden by a single best-model comparison.
+
+
+\begin{scriptsize}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.188\textwidth}>{\raggedright\arraybackslash}p{0.188\textwidth}>{\raggedright\arraybackslash}p{0.188\textwidth}>{\raggedright\arraybackslash}p{0.188\textwidth}>{\raggedright\arraybackslash}p{0.188\textwidth}@{}}
+\caption{Test performance across ten matched seeds}\label{tab:3}\\
+\toprule
+\textbf{Dataset} & \textbf{Reducer} & \textbf{Head} & \textbf{Macro-F1 mean +/- SD} & \textbf{Accuracy mean} \\
+\midrule
+\endfirsthead
+\caption[]{Test performance across ten matched seeds (continued)}\\
+\toprule
+\textbf{Dataset} & \textbf{Reducer} & \textbf{Head} & \textbf{Macro-F1 mean +/- SD} & \textbf{Accuracy mean} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r}{Continued on next page}\\
+\endfoot
+\bottomrule
+\endlastfoot
+cifar10 & lda6 & lr & 0.8985 +/- 0.0155 & 0.8989 \\
+cifar10 & lda6 & mlp & 0.8812 +/- 0.0153 & 0.8815 \\
+cifar10 & lda6 & rbf & 0.9003 +/- 0.0154 & 0.9004 \\
+cifar10 & lda6 & vqc & 0.6649 +/- 0.0320 & 0.6647 \\
+cifar10 & nca6 & lr & 0.9326 +/- 0.0023 & 0.9326 \\
+cifar10 & nca6 & mlp & 0.9191 +/- 0.0038 & 0.9196 \\
+cifar10 & nca6 & rbf & 0.9381 +/- 0.0028 & 0.9381 \\
+cifar10 & nca6 & vqc & 0.5296 +/- 0.0385 & 0.5366 \\
+cifar10 & pca6 & lr & 0.8630 +/- 0.0052 & 0.8637 \\
+cifar10 & pca6 & mlp & 0.8493 +/- 0.0065 & 0.8516 \\
+cifar10 & pca6 & rbf & 0.8782 +/- 0.0064 & 0.8781 \\
+cifar10 & pca6 & vqc & 0.5261 +/- 0.0424 & 0.5372 \\
+cifar10 & slp6 & lr & 0.9455 +/- 0.0033 & 0.9456 \\
+cifar10 & slp6 & mlp & 0.9336 +/- 0.0049 & 0.9336 \\
+cifar10 & slp6 & rbf & 0.9434 +/- 0.0033 & 0.9434 \\
+cifar10 & slp6 & vqc & 0.8555 +/- 0.0158 & 0.8539 \\
+eurosat & lda6 & lr & 0.8460 +/- 0.0061 & 0.8565 \\
+eurosat & lda6 & mlp & 0.8154 +/- 0.0124 & 0.8275 \\
+eurosat & lda6 & rbf & 0.8476 +/- 0.0083 & 0.8578 \\
+eurosat & lda6 & vqc & 0.4970 +/- 0.0405 & 0.5063 \\
+eurosat & nca6 & lr & 0.8409 +/- 0.0059 & 0.8482 \\
+eurosat & nca6 & mlp & 0.8246 +/- 0.0082 & 0.8329 \\
+eurosat & nca6 & rbf & 0.8517 +/- 0.0071 & 0.8588 \\
+eurosat & nca6 & vqc & 0.3241 +/- 0.0360 & 0.3454 \\
+eurosat & pca6 & lr & 0.7532 +/- 0.0058 & 0.7687 \\
+eurosat & pca6 & mlp & 0.7388 +/- 0.0120 & 0.7566 \\
+eurosat & pca6 & rbf & 0.7664 +/- 0.0062 & 0.7800 \\
+eurosat & pca6 & vqc & 0.3357 +/- 0.0342 & 0.3671 \\
+eurosat & slp6 & lr & 0.8862 +/- 0.0062 & 0.8905 \\
+eurosat & slp6 & mlp & 0.8694 +/- 0.0093 & 0.8736 \\
+eurosat & slp6 & rbf & 0.8790 +/- 0.0079 & 0.8833 \\
+eurosat & slp6 & vqc & 0.7522 +/- 0.0118 & 0.7539 \\
+pathmnist & lda6 & lr & 0.7710 +/- 0.0173 & 0.8261 \\
+pathmnist & lda6 & mlp & 0.7484 +/- 0.0236 & 0.8034 \\
+pathmnist & lda6 & rbf & 0.7774 +/- 0.0153 & 0.8345 \\
+pathmnist & lda6 & vqc & 0.3871 +/- 0.0554 & 0.3961 \\
+pathmnist & nca6 & lr & 0.7706 +/- 0.0271 & 0.8136 \\
+pathmnist & nca6 & mlp & 0.7420 +/- 0.0316 & 0.7850 \\
+pathmnist & nca6 & rbf & 0.7694 +/- 0.0266 & 0.8141 \\
+pathmnist & nca6 & vqc & 0.3313 +/- 0.0435 & 0.3770 \\
+pathmnist & pca6 & lr & 0.7021 +/- 0.0217 & 0.7427 \\
+pathmnist & pca6 & mlp & 0.6849 +/- 0.0194 & 0.7295 \\
+pathmnist & pca6 & rbf & 0.7092 +/- 0.0120 & 0.7517 \\
+pathmnist & pca6 & vqc & 0.3369 +/- 0.0450 & 0.3856 \\
+pathmnist & slp6 & lr & 0.7946 +/- 0.0289 & 0.8436 \\
+pathmnist & slp6 & mlp & 0.7789 +/- 0.0296 & 0.8297 \\
+pathmnist & slp6 & rbf & 0.7950 +/- 0.0261 & 0.8436 \\
+pathmnist & slp6 & vqc & 0.6512 +/- 0.0327 & 0.6993 \\
+\end{longtable}
+\end{scriptsize}
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{Fig3.png}
+\caption{Mean test macro-F1 for each controlled reducer-head condition}\label{fig:3}
+\end{figure*}
+
+\subsection{Compression and head effects}
+
+The mean absolute matched VQC-MLP gap was 0.2995, at least as large as the mean absolute compression penalty of 0.0773.
+
+
+\begin{table*}[htbp]
+\centering
+\caption{Compression penalty relative to the full-space RBF reference}\label{tab:4}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Dataset} & \textbf{Reducer} & \textbf{RBF 384D} & \textbf{RBF 6D} & \textbf{Penalty} & \textbf{95\% CI} \\
+\midrule
+cifar10 & pca6 & 0.9647 & 0.8782 & 0.0865 & [0.0834, 0.0899] \\
+cifar10 & lda6 & 0.9647 & 0.9003 & 0.0644 & [0.0552, 0.0740] \\
+cifar10 & nca6 & 0.9647 & 0.9381 & 0.0266 & [0.0248, 0.0282] \\
+cifar10 & slp6 & 0.9647 & 0.9434 & 0.0213 & [0.0193, 0.0232] \\
+eurosat & pca6 & 0.9314 & 0.7664 & 0.1650 & [0.1608, 0.1690] \\
+eurosat & lda6 & 0.9314 & 0.8476 & 0.0837 & [0.0790, 0.0893] \\
+eurosat & nca6 & 0.9314 & 0.8517 & 0.0797 & [0.0753, 0.0840] \\
+eurosat & slp6 & 0.9314 & 0.8790 & 0.0523 & [0.0475, 0.0578] \\
+pathmnist & pca6 & 0.8497 & 0.7092 & 0.1405 & [0.1311, 0.1485] \\
+pathmnist & lda6 & 0.8497 & 0.7774 & 0.0723 & [0.0645, 0.0806] \\
+pathmnist & nca6 & 0.8497 & 0.7694 & 0.0803 & [0.0651, 0.0936] \\
+pathmnist & slp6 & 0.8497 & 0.7950 & 0.0547 & [0.0373, 0.0697] \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\begin{table*}[htbp]
+\centering
+\caption{Matched quantum-classical head differences across ten paired seeds}\label{tab:5}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Dataset} & \textbf{Reducer} & \textbf{VQC minus MLP} & \textbf{95\% paired bootstrap CI} & \textbf{Holm adjusted p} \\
+\midrule
+cifar10 & pca6 & -0.3232 & [-0.3489, -0.3001] & 0.01562 \\
+cifar10 & lda6 & -0.2163 & [-0.2360, -0.1972] & 0.01562 \\
+cifar10 & nca6 & -0.3895 & [-0.4114, -0.3668] & 0.01562 \\
+cifar10 & slp6 & -0.0781 & [-0.0876, -0.0699] & 0.01562 \\
+eurosat & pca6 & -0.4031 & [-0.4212, -0.3846] & 0.01562 \\
+eurosat & lda6 & -0.3184 & [-0.3398, -0.2982] & 0.01562 \\
+eurosat & nca6 & -0.5005 & [-0.5229, -0.4804] & 0.01562 \\
+eurosat & slp6 & -0.1172 & [-0.1233, -0.1104] & 0.01562 \\
+pathmnist & pca6 & -0.3481 & [-0.3704, -0.3264] & 0.01562 \\
+pathmnist & lda6 & -0.3613 & [-0.3894, -0.3278] & 0.01562 \\
+pathmnist & nca6 & -0.4107 & [-0.4456, -0.3762] & 0.01562 \\
+pathmnist & slp6 & -0.1278 & [-0.1438, -0.1098] & 0.01562 \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\begin{table*}[htbp]
+\centering
+\caption{Friedman tests of VQC performance across the four reducers}\label{tab:6}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Dataset} & \textbf{Friedman statistic} & \textbf{p value} & \textbf{Paired seed blocks} \\
+\midrule
+cifar10 & 27.120 & 5.56e-06 & 10 \\
+eurosat & 27.120 & 5.56e-06 & 10 \\
+pathmnist & 27.120 & 5.56e-06 & 10 \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+Reducer choice affected VQC macro-F1 in all three domains (Friedman statistic 27.12, p = 5.56e-6 for each dataset). Every VQC-minus-MLP contrast was negative, its paired bootstrap confidence interval excluded zero, and its Holm-adjusted Wilcoxon p value was 0.0156. The smallest disadvantage occurred with SLP-6, indicating that the learned supervised bottleneck mitigated, but did not remove, the quantum-head deficit.
+
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{Fig4.png}
+\caption{Compression penalties and matched quantum-head gaps}\label{fig:4}
+\end{figure*}
+
+\subsection{Representation geometry and error structure}
+
+Distance preservation, neighborhood trustworthiness, Fisher separation, and silhouette score were computed on the fixed validation subset. Their association with VQC macro-F1 indicates whether circuit behavior tracks the geometry delivered by the reducer rather than the reducer label alone.
+
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{Fig5.png}
+\caption{Representation geometry in relation to VQC performance}\label{fig:5}
+\end{figure*}
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=0.76\textwidth]{Fig6a.png}
+\caption{Row-normalized CIFAR-10 test confusion matrix for validation-selected SLP-6 with logistic regression}\label{fig:6a}
+\end{figure*}
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=0.76\textwidth]{Fig6b.png}
+\caption{Row-normalized EuroSAT test confusion matrix for validation-selected SLP-6 with logistic regression}\label{fig:6b}
+\end{figure*}
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=0.76\textwidth]{Fig6c.png}
+\caption{Row-normalized PathMNIST test confusion matrix for validation-selected SLP-6 with RBF-SVM}\label{fig:6c}
+\end{figure*}
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{Fig7.png}
+\caption{Reliability diagrams for validation-selected configurations}\label{fig:7}
+\end{figure*}
+
+\subsection{Runtime}
+
+Runtime was recorded for the observed software implementation. Because the VQC used analytic statevector simulation on classical hardware, these measurements describe implementation cost only and cannot support a quantum-speedup claim.
+
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{Fig8.png}
+\caption{Mean observed fit time by head and dataset}\label{fig:8}
+\end{figure*}
+
+\section{Discussion and conclusion}
+
+The controlled design changes the interpretation of a classical-quantum performance gap. When the full-space reference declines substantially after six-dimensional projection, the downstream model is operating after measurable information loss. Conversely, a persistent VQC-MLP gap on identical vectors isolates the decision head more directly than conventional transfer-learning comparisons.
+
+
+Supervised reducers can favor class separation under a severe information budget, but their validation selection must remain separate from test evaluation. The ten-seed paired design also shows whether a favorable mean is stable or depends on a small number of training subsets. Calibration provides a complementary view because similar macro-F1 values can coexist with materially different confidence quality.
+
+
+The results should be read as a benchmark of low-dimensional predictive heads, not as evidence that a quantum circuit offers computational advantage. This interpretation is consistent with evidence that optimized classical learners can remain competitive when data are available \citep{HUANG-2021} and with recent QMI benchmarks that find no broad quantum-model advantage across conventional tasks \citep{SCHNABEL-ROTH-2025}. A competitive VQC result would show that the chosen circuit can exploit a representation already shaped by classical learning; it would not show speedup, hardware advantage, or universal superiority. The circuit uses a shallow data-reuploading design to avoid unnecessary depth, while the analytic statevector setting deliberately separates representation and head effects from shot noise or device noise \citep{PEREZ-SALINAS-2020,THANASILP-2024}.
+
+
+Several boundaries constrain the interpretation. The VQC was evaluated with analytic statevector simulation; finite-shot sampling, device noise, connectivity constraints, transpilation overhead, and physical-hardware drift were outside the scope. DINOv2 was frozen, so the conclusions concern downstream bottlenecks rather than end-to-end optimization. The benchmark used three image domains and a fixed six-dimensional budget, and other encoders, dimensions, and circuit families may produce different interactions.
+
+
+In conclusion, this study separates pre-quantum representation loss from quantum-head behavior by crossing four reducers and four matched heads on identical six-dimensional vectors from a frozen self-supervised encoder. Full-space references quantify information lost before the circuit, while parameter parity and paired seeds isolate the downstream comparison. The evidence identifies where the predictive bottleneck occurs under the evaluated protocol without supporting a claim of quantum advantage.
+
+
+\textbf{Supplementary Information.} The supplementary material accompanying this submission contains the executable notebook with stored outputs, configuration files, split and artifact hashes, prediction-level outputs, model checkpoints, environment records, and editable figure sources.
+
+
+\textbf{Acknowledgements.} The authors have no acknowledgements to declare.
+
+
+\textbf{Author Contributions.} F.Y.S.J. contributed conceptualization, methodology, software, formal analysis, investigation, data curation, visualization, writing---original draft, and project administration. K.A.B. contributed supervision, validation, resources, and writing---review and editing. Both authors reviewed and approved the final manuscript.
+
+
+\textbf{Funding.} The authors received no specific funding for this work.
+
+
+\textbf{Data Availability.} CIFAR-10, EuroSAT RGB, and PathMNIST are publicly available from the original repositories cited in the Methods. The exact split manifests, sample identifiers, audit reports, hashes, derived metrics, and prediction-level outputs used in this study are included in the supplementary reproducibility package and are available from the corresponding author.
+
+
+\textbf{Code Availability.} The executable notebook, source code, configuration files, environment records, trained artifacts, split manifests, and prediction-level outputs are publicly available at \url{https://github.com/haejoon06/disentangling-representation-compression-quantum-head-effects}.
+
+
+\section*{Declarations}
+
+\textbf{Competing Interests.} The authors declare that they have no competing interests.
+
+
+\textbf{Open Access.} The authors request open-access publication under the Creative Commons Attribution 4.0 International License, subject to the journal's publication agreement. This license permits use, sharing, adaptation, distribution, and reproduction with appropriate credit, a link to the license, and an indication of any changes.
+
+
+\bibliography{references}
+
+\end{document}
+
