@@ -13,9 +13,10 @@ from docx.text.paragraph import Paragraph
 
 
 ROOT = Path(r"D:\Quantum")
+SUBMISSION_DOCX = ROOT / "article" / "Article09_QMI_Submission_Final.docx"
 FINAL_DOCX = ROOT / "article" / "Article09_QMI_Submission_Final_Figures.docx"
 CORRECTED_DOCX = ROOT / "article" / "Article09_QMI_Submission_Complete_CM.docx"
-DOCX = FINAL_DOCX if FINAL_DOCX.exists() else CORRECTED_DOCX if CORRECTED_DOCX.exists() else ROOT / "article" / "Article09_QMI_Submission.docx"
+DOCX = SUBMISSION_DOCX if SUBMISSION_DOCX.exists() else FINAL_DOCX if FINAL_DOCX.exists() else CORRECTED_DOCX if CORRECTED_DOCX.exists() else ROOT / "article" / "Article09_QMI_Submission.docx"
 RIS = ROOT / "references" / "article09_qmi_references.ris"
 TEMPLATE = ROOT / "templates" / "springer-nature-2024" / "sn-article-template"
 PACKAGE = ROOT / "article" / "Article09_QMI_LaTeX_Submission"
@@ -254,6 +255,18 @@ def declaration_paragraph(text: str) -> str:
     return r"\textbf{" + escape_latex(match.group(1)) + "}" + citations_to_latex(match.group(2))
 
 
+STATEMENT_LABELS = (
+    "Supplementary Information.",
+    "Acknowledgements.",
+    "Author Contributions.",
+    "Funding.",
+    "Data Availability.",
+    "Code Availability.",
+    "Competing Interests.",
+    "Open Access.",
+)
+
+
 def build_tex() -> str:
     document = Document(DOCX)
     paragraphs = document.paragraphs
@@ -296,7 +309,7 @@ def build_tex() -> str:
                 if text == "References":
                     break
                 heading = clean_heading(text)
-                declarations = heading == "Statements and Declarations"
+                declarations = heading in {"Statements and Declarations", "Declarations"}
                 command = "section*" if declarations else "section"
                 lines.append(rf"\{command}{{{escape_latex(heading)}}}")
                 continue
@@ -312,7 +325,11 @@ def build_tex() -> str:
             if figure_match:
                 lines.append(figure_latex(text, int(figure_match.group(1))))
                 continue
-            rendered = declaration_paragraph(text) if declarations else citations_to_latex(text)
+            rendered = (
+                declaration_paragraph(text)
+                if declarations or text.startswith(STATEMENT_LABELS)
+                else citations_to_latex(text)
+            )
             lines.append(rendered + "\n")
             if text.startswith("PCA-6 represented") and not equation_flags["compression"]:
                 lines.append(r"\begin{equation}\tilde{x}_j=\pi\tanh(z_j)\label{eq:angle-scaling}\end{equation}")

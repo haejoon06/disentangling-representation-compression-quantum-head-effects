@@ -797,7 +797,7 @@ def build_manuscript(output: Path) -> None:
     )
     _add_full_width_figure(doc, "figure_08_runtime", "Figure 8 Mean observed fit time by head and dataset")
 
-    doc.add_heading("4 Discussion", level=1)
+    doc.add_heading("4 Discussion and conclusion", level=1)
     _paragraph(
         doc,
         "The controlled design changes the interpretation of a classical-quantum performance gap. When the full-space reference declines substantially after six-dimensional projection, the downstream model is operating after measurable information loss. Conversely, a persistent VQC-MLP gap on identical vectors isolates the decision head more directly than conventional transfer-learning comparisons.",
@@ -811,33 +811,57 @@ def build_manuscript(output: Path) -> None:
         "The results should be read as a benchmark of low-dimensional predictive heads, not as evidence that a quantum circuit offers computational advantage. This interpretation is consistent with evidence that optimized classical learners can remain competitive when data are available (Huang et al 2021) and with recent QMI benchmarks that find no broad quantum-model advantage across conventional tasks (Schnabel and Roth 2025). A competitive VQC result would show that the chosen circuit can exploit a representation already shaped by classical learning; it would not show speedup, hardware advantage, or universal superiority. The circuit uses a shallow data-reuploading design to avoid unnecessary depth, while the analytic statevector setting deliberately separates representation and head effects from shot noise or device noise (Perez-Salinas et al 2020; Thanasilp et al 2024).",
     )
 
-    doc.add_heading("5 Limitations", level=1)
     _paragraph(
         doc,
-        "The VQC was evaluated with analytic statevector simulation. Finite-shot sampling, device noise, connectivity constraints, transpilation overhead, and physical-hardware drift were outside the scope. DINOv2 was frozen, so the conclusions concern downstream bottlenecks rather than end-to-end optimization. The benchmark used three image domains and a fixed six-dimensional budget; other encoders, dimensions, and circuit families may yield different interactions.",
+        "Several boundaries constrain the interpretation. The VQC was evaluated with analytic statevector simulation; finite-shot sampling, device noise, connectivity constraints, transpilation overhead, and physical-hardware drift were outside the scope. DINOv2 was frozen, so the conclusions concern downstream bottlenecks rather than end-to-end optimization. The benchmark used three image domains and a fixed six-dimensional budget, and other encoders, dimensions, and circuit families may produce different interactions.",
+    )
+    _paragraph(
+        doc,
+        "In conclusion, this study separates pre-quantum representation loss from quantum-head behavior by crossing four reducers and four matched heads on identical six-dimensional vectors from a frozen self-supervised encoder. Full-space references quantify information lost before the circuit, while parameter parity and paired seeds isolate the downstream comparison. The evidence identifies where the predictive bottleneck occurs under the evaluated protocol without supporting a claim of quantum advantage.",
     )
 
-    doc.add_heading("6 Conclusion", level=1)
     _paragraph(
         doc,
-        "This study separates pre-quantum representation loss from quantum-head behavior by crossing four reducers and four matched heads on identical six-dimensional vectors from a frozen self-supervised encoder. Full-space references quantify information lost before the circuit, while parameter parity and paired seeds isolate the downstream comparison. The resulting evidence supports claims about where the predictive bottleneck occurs under the evaluated protocol, without invoking unsupported quantum advantage.",
+        "Supplementary Information. The supplementary material accompanying this submission contains the executable notebook with stored outputs, configuration files, split and artifact hashes, prediction-level outputs, model checkpoints, environment records, and editable figure sources.",
+        bold_lead="Supplementary Information.",
+    )
+    _paragraph(
+        doc,
+        "Acknowledgements. The authors have no acknowledgements to declare.",
+        bold_lead="Acknowledgements.",
+    )
+    _paragraph(
+        doc,
+        "Author Contributions. F.Y.S.J. contributed conceptualization, methodology, software, formal analysis, investigation, data curation, visualization, writing—original draft, and project administration. K.A.B. contributed supervision, validation, resources, and writing—review and editing. Both authors reviewed and approved the final manuscript.",
+        bold_lead="Author Contributions.",
+    )
+    _paragraph(
+        doc,
+        "Funding. The authors received no specific funding for this work.",
+        bold_lead="Funding.",
+    )
+    _paragraph(
+        doc,
+        "Data Availability. CIFAR-10, EuroSAT RGB, and PathMNIST are publicly available from the original repositories cited in the Methods. The exact split manifests, sample identifiers, audit reports, hashes, derived metrics, and prediction-level outputs used in this study are included in the supplementary reproducibility package and are available from the corresponding author.",
+        bold_lead="Data Availability.",
+    )
+    _paragraph(
+        doc,
+        "Code Availability. The executable notebook, source code, configuration files, environment records, and trained artifacts are included in the supplementary reproducibility package. These materials will also be archived in a public repository upon acceptance.",
+        bold_lead="Code Availability.",
     )
 
-    doc.add_heading("Statements and Declarations", level=1)
+    doc.add_heading("Declarations", level=1)
     _paragraph(
         doc,
-        "Data availability. CIFAR-10, EuroSAT RGB, and PathMNIST are publicly available from their original repositories. Frozen split manifests, hashes, derived metrics, and prediction-level outputs are included with the reproducibility package.",
+        "Competing Interests. The authors declare that they have no competing interests.",
+        bold_lead="Competing Interests.",
     )
     _paragraph(
         doc,
-        "Code availability. The executable notebook, source code, configuration files, environment record, checkpoints, and model artifacts are publicly available at https://github.com/haejoon06/qml-compression-head-benchmark.",
+        "Open Access. The authors request open-access publication under the Creative Commons Attribution 4.0 International License, subject to the journal's publication agreement. This license permits use, sharing, adaptation, distribution, and reproduction with appropriate credit, a link to the license, and an indication of any changes.",
+        bold_lead="Open Access.",
     )
-    _paragraph(
-        doc,
-        "Author contributions. F.Y.S.J. contributed conceptualization, methodology, software, formal analysis, investigation, data curation, visualization, writing—original draft, and project administration. K.A.B. contributed supervision, validation, resources, and writing—review and editing. Both authors reviewed and approved the final manuscript.",
-    )
-    _paragraph(doc, "Funding. The authors received no specific funding for this work.")
-    _paragraph(doc, "Competing interests. The authors declare that they have no competing interests.")
     doc.add_heading("References", level=1)
     _add_mendeley_bibliography(doc, REFERENCES)
 
