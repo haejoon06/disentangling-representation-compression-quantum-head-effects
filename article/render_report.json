@@ -1,0 +1,23 @@
+{
+  "command": [
+    "C:\\Users\\Admin Riset\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "C:\\Users\\Admin Riset\\.codex\\plugins\\cache\\openai-primary-runtime\\documents\\26.1013.11914\\skills\\documents\\render_docx.py",
+    "D:\\Quantum\\article\\Article09_QMI_Submission.docx",
+    "--output_dir",
+    "D:\\Quantum\\article\\qa_render",
+    "--emit_pdf"
+  ],
+  "docx_sha256": "d9d4095dc6117235d08ed02746453b821f066666732ed6391c3cd4d43a0f6963",
+  "fallback": {
+    "rendered_pages": 8,
+    "renderer": "microsoft-word+pypdfium2",
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "8\n"
+  },
+  "models_zip_sha256": "42e032bc41dfe0311f420aab6fd972a195144c55e1097f8b0b3db18f75e7218e",
+  "rendered_pages": 8,
+  "returncode": 0,
+  "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\Admin Riset\\.codex\\plugins\\cache\\openai-primary-runtime\\documents\\26.1013.11914\\skills\\documents\\render_docx.py\", line 546, in <module>\n    main()\n  File \"C:\\Users\\Admin Riset\\.codex\\plugins\\cache\\openai-primary-runtime\\documents\\26.1013.11914\\skills\\documents\\render_docx.py\", line 538, in main\n    rasterize(render_input_path, out_dir, dpi, verbose=args.verbose, emit_pdf=args.emit_pdf)\n  File \"C:\\Users\\Admin Riset\\.codex\\plugins\\cache\\openai-primary-runtime\\documents\\26.1013.11914\\skills\\documents\\render_docx.py\", line 418, in rasterize\n    pdf_path, debug = convert_to_pdf(\n                      ^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Admin Riset\\.codex\\plugins\\cache\\openai-primary-runtime\\documents\\26.1013.11914\\skills\\documents\\render_docx.py\", line 270, in convert_to_pdf\n    soffice = _resolve_soffice()\n              ^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Admin Riset\\.codex\\plugins\\cache\\openai-primary-runtime\\documents\\26.1013.11914\\skills\\documents\\render_docx.py\", line 79, in _resolve_soffice\n    raise FileNotFoundError(f\"LibreOffice {executable_name} was not found on PATH\")\nFileNotFoundError: LibreOffice soffice.exe was not found on PATH\n",
+  "stdout": ""
+}

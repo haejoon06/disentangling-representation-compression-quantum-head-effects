@@ -1,0 +1,1 @@
+C:\Users\Admin Riset\miniconda3\envs\quantum_env\python.exe

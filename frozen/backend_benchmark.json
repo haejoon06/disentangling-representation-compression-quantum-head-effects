@@ -1,0 +1,17 @@
+{
+  "results": {
+    "default.qubit": {
+      "backward_seconds": 0.5082678999751806,
+      "forward_seconds": 1.5975829000235535,
+      "score": 4.138922399899457,
+      "valid": true
+    },
+    "lightning.qubit": {
+      "returncode": 3221225477,
+      "stderr": "",
+      "stdout": "",
+      "valid": false
+    }
+  },
+  "selected_backend": "default.qubit"
+}

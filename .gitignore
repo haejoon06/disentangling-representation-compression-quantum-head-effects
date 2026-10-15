@@ -1,0 +1,17 @@
+data/
+runs/
+logs/
+state/
+tmp/
+*.pyc
+__pycache__/
+.pytest_cache/
+notebooks/.ipynb_checkpoints/
+article/qa_*/
+article/*render*.pdf
+article/*
+!article/Article09_QMI_Submission.docx
+!article/render_report.json
+models/*
+!models/Article09_Models.zip
+

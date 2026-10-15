@@ -1,0 +1,10 @@
+dataset,comparison,statistic,p_value,holm_p
+cifar10,lda6_vs_pca6,0.0,0.001953125,0.005859375
+cifar10,nca6_vs_pca6,27.0,1.0,1.0
+cifar10,slp6_vs_pca6,0.0,0.001953125,0.005859375
+eurosat,lda6_vs_pca6,0.0,0.001953125,0.005859375
+eurosat,nca6_vs_pca6,20.0,0.4921875,0.4921875
+eurosat,slp6_vs_pca6,0.0,0.001953125,0.005859375
+pathmnist,lda6_vs_pca6,0.0,0.001953125,0.005859375
+pathmnist,nca6_vs_pca6,24.0,0.76953125,0.76953125
+pathmnist,slp6_vs_pca6,0.0,0.001953125,0.005859375

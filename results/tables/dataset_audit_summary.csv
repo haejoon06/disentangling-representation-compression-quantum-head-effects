@@ -1,0 +1,4 @@
+Dataset,Total decoded,Duplicate groups,Near-pair links,Quarantined,Quarantine split,Test split,Train split,Val split
+cifar10,60000,9,9,10,10.0,9995,44995,5000
+eurosat,27000,5,7,0,,4050,18900,4050
+pathmnist,107180,3,15,9,9.0,7179,89991,10001

@@ -1,0 +1,141 @@
+cifar10:
+  full384:
+    lr:
+      C: 0.1
+    rbf:
+      C: 1.0
+      gamma: scale
+  lda6:
+    lr:
+      C: 0.1
+    mlp:
+      lr: 0.01
+    rbf:
+      C: 0.1
+      gamma: scale
+    vqc:
+      lr: 0.01
+  nca6:
+    lr:
+      C: 1.0
+    mlp:
+      lr: 0.01
+    rbf:
+      C: 1.0
+      gamma: scale
+    vqc:
+      lr: 0.01
+  pca6:
+    lr:
+      C: 0.1
+    mlp:
+      lr: 0.01
+    rbf:
+      C: 100.0
+      gamma: 0.01
+    vqc:
+      lr: 0.003
+  slp6:
+    lr:
+      C: 0.1
+    mlp:
+      lr: 0.01
+    rbf:
+      C: 1.0
+      gamma: 0.01
+    vqc:
+      lr: 0.01
+eurosat:
+  full384:
+    lr:
+      C: 1.0
+    rbf:
+      C: 10.0
+      gamma: scale
+  lda6:
+    lr:
+      C: 1.0
+    mlp:
+      lr: 0.01
+    rbf:
+      C: 100.0
+      gamma: 0.01
+    vqc:
+      lr: 0.01
+  nca6:
+    lr:
+      C: 10.0
+    mlp:
+      lr: 0.01
+    rbf:
+      C: 10.0
+      gamma: 0.01
+    vqc:
+      lr: 0.003
+  pca6:
+    lr:
+      C: 10.0
+    mlp:
+      lr: 0.003
+    rbf:
+      C: 1.0
+      gamma: 0.1
+    vqc:
+      lr: 0.01
+  slp6:
+    lr:
+      C: 0.1
+    mlp:
+      lr: 0.003
+    rbf:
+      C: 1.0
+      gamma: scale
+    vqc:
+      lr: 0.01
+pathmnist:
+  full384:
+    lr:
+      C: 0.1
+    rbf:
+      C: 10.0
+      gamma: scale
+  lda6:
+    lr:
+      C: 10.0
+    mlp:
+      lr: 0.003
+    rbf:
+      C: 1.0
+      gamma: scale
+    vqc:
+      lr: 0.003
+  nca6:
+    lr:
+      C: 1.0
+    mlp:
+      lr: 0.01
+    rbf:
+      C: 1.0
+      gamma: scale
+    vqc:
+      lr: 0.01
+  pca6:
+    lr:
+      C: 1.0
+    mlp:
+      lr: 0.01
+    rbf:
+      C: 10.0
+      gamma: scale
+    vqc:
+      lr: 0.01
+  slp6:
+    lr:
+      C: 1.0
+    mlp:
+      lr: 0.01
+    rbf:
+      C: 0.1
+      gamma: 0.01
+    vqc:
+      lr: 0.01

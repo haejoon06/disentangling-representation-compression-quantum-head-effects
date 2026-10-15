@@ -1,0 +1,74 @@
+project:
+  id: article09
+  title: "Compression or Quantum Head? Disentangling Pre-Quantum Representation Loss in Quantum Transfer Learning for Visual Classification"
+  split_seed: 2026
+  validation_seed: 2026
+  pilot_seed: 2026
+  final_seeds: [11, 22, 33, 44, 55, 66, 77, 88, 99, 111]
+  train_per_class: 150
+  val_per_class: 100
+
+environment:
+  python: "C:/Users/Admin Riset/miniconda3/envs/quantum_env/python.exe"
+
+datasets:
+  cifar10:
+    classes: 10
+    split: official_test_train_90_10_val
+  eurosat:
+    classes: 10
+    split: grouped_70_15_15
+  pathmnist:
+    classes: 9
+    split: official
+
+audit:
+  phash_hamming_max: 4
+  ssim_min: 0.98
+  thumbnail_size: 64
+
+features:
+  encoder: dinov2_vits14
+  dimension: 384
+  image_size: 224
+  batch_size: 256
+  dtype: float32
+
+reducers:
+  names: [pca6, lda6, nca6, slp6]
+  dimension: 6
+  nca_max_iter: 100
+  nca_tol: 1.0e-5
+  slp:
+    lr: 1.0e-3
+    weight_decay: 1.0e-4
+    batch_size: 64
+    max_epochs: 50
+    patience: 10
+
+heads:
+  names: [lr, rbf, mlp, vqc]
+  lr_grid: [0.01, 0.1, 1.0, 10.0]
+  rbf_c_grid: [0.1, 1.0, 10.0, 100.0]
+  rbf_gamma_grid: [scale, 0.01, 0.1, 1.0]
+  neural_lr_grid: [0.001, 0.003, 0.01]
+  max_epochs: 100
+  batch_size: 32
+  weight_decay: 1.0e-4
+  gradient_clip: 1.0
+  patience: 12
+
+quantum:
+  qubits: 6
+  layers: 2
+  shots: null
+  candidate_backends: [default.qubit, lightning.qubit]
+  benchmark_forward: 100
+  benchmark_backward: 20
+
+statistics:
+  bootstrap_resamples: 10000
+  ece_bins: 15
+  distance_pairs: 20000
+  trustworthiness_k: 10
+

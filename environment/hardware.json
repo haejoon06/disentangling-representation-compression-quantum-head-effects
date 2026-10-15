@@ -1,0 +1,42 @@
+{
+  "captured_at": "2026-10-14T03:19:17.101497+00:00",
+  "cuda_available": true,
+  "cuda_device_count": 2,
+  "executable": "C:\\Users\\Admin Riset\\miniconda3\\envs\\quantum_env\\python.exe",
+  "gpu_names": [
+    "NVIDIA GeForce RTX 3080 Ti",
+    "NVIDIA GeForce RTX 3080 Ti"
+  ],
+  "nvcc": {
+    "command": [
+      "nvcc",
+      "--version"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Feb_27_16:28:36_Pacific_Standard_Time_2024\nCuda compilation tools, release 12.4, V12.4.99\nBuild cuda_12.4.r12.4/compiler.33961263_0"
+  },
+  "nvidia_smi": {
+    "command": [
+      "nvidia-smi"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "Wed Oct 14 10:19:17 2026       \n+-----------------------------------------------------------------------------------------+\n| NVIDIA-SMI 610.88                 KMD Version: 610.88        CUDA UMD Version: 13.3     |\n+-----------------------------------------+------------------------+----------------------+\n| GPU  Name                  Driver-Model | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n|                                         |                        |               MIG M. |\n|=========================================+========================+======================|\n|   0  NVIDIA GeForce RTX 3080 Ti   WDDM  |   00000000:41:00.0  On |                  N/A |\n|  0%   43C    P8             35W /  400W |     879MiB /  12288MiB |      7%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n|   1  NVIDIA GeForce RTX 3080 Ti   WDDM  |   00000000:42:00.0 Off |                  N/A |\n|  0%   35C    P8             22W /  400W |       0MiB /  12288MiB |      0%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n\n+-----------------------------------------------------------------------------------------+\n| Processes:                                                                              |\n|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n|        ID   ID                                                               Usage      |\n|=========================================================================================|\n|    0   N/A  N/A            2032    C+G   ...y\\StartMenuExperienceHost.exe      N/A      |\n|    0   N/A  N/A            2364    C+G   ...5n1h2txyewy\\TextInputHost.exe      N/A      |\n|    0   N/A  N/A            5184    C+G   C:\\Windows\\explorer.exe               N/A      |\n|    0   N/A  N/A            6736    C+G   ....0.4258.53\\msedgewebview2.exe      N/A      |\n|    0   N/A  N/A            6852    C+G   ...\\codex-computer-use-swift.exe      N/A      |\n|    0   N/A  N/A            8752    C+G   ...8bbwe\\PhoneExperienceHost.exe      N/A      |\n|    0   N/A  N/A           13604    C+G   ...2txyewy\\CrossDeviceResume.exe      N/A      |\n|    0   N/A  N/A           15100    C+G   ...t\\Edge\\Application\\msedge.exe      N/A      |\n|    0   N/A  N/A           15920    C+G   ...IA app\\CEF\\NVIDIA Overlay.exe      N/A      |\n|    0   N/A  N/A           16820    C+G   ...ouryDevice\\asus_framework.exe      N/A      |\n|    0   N/A  N/A           20372    C+G   ...xyewy\\ShellExperienceHost.exe      N/A      |\n|    0   N/A  N/A           20856    C+G   ...1g1gvanyjgm\\WhatsApp.Root.exe      N/A      |\n|    0   N/A  N/A           24168    C+G   ....0.4258.53\\msedgewebview2.exe      N/A      |\n|    0   N/A  N/A           27380    C+G   ...t\\Edge\\Application\\msedge.exe      N/A      |\n|    0   N/A  N/A           29156    C+G   ...indows\\System32\\ShellHost.exe      N/A      |\n|    0   N/A  N/A           31284    C+G   ..._cw5n1h2txyewy\\SearchHost.exe      N/A      |\n|    0   N/A  N/A           32380    C+G   ...2p2nqsd0c76g0\\app\\ChatGPT.exe      N/A      |\n|    0   N/A  N/A           32412    C+G   ...IA app\\CEF\\NVIDIA Overlay.exe      N/A      |\n|    0   N/A  N/A           34912    C+G   ...App_cw5n1h2txyewy\\LockApp.exe      N/A      |\n+-----------------------------------------------------------------------------------------+"
+  },
+  "packages": {
+    "medmnist": "3.0.2",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "pennylane": "0.44.1",
+    "pennylane-lightning": "0.45.0",
+    "scikit-learn": "1.7.2",
+    "scipy": "1.17.1",
+    "torch": "2.5.1+cu124",
+    "torchvision": "0.20.1+cu124"
+  },
+  "platform": "Windows-10-10.0.26200-SP0",
+  "processor": "AMD64 Family 25 Model 8 Stepping 2, AuthenticAMD",
+  "python": "3.11.15 | packaged by Anaconda, Inc. | (main, Mar 11 2026, 17:12:15) [MSC v.1942 64 bit (AMD64)]",
+  "torch_cuda": "12.4"
+}
