@@ -37,7 +37,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
+from IPython.display import SVG, display
 from sklearn.calibration import calibration_curve
 from sklearn.metrics import confusion_matrix
 
@@ -78,35 +78,11 @@ pd.DataFrame({
         _markdown("## Figure 1 Experimental pipeline"),
         _code(
             """
-fig, ax = plt.subplots(figsize=(11.5, 6.2))
-ax.set_xlim(0, 12); ax.set_ylim(0, 7); ax.axis('off')
-
-def box(x, y, w, h, text, color):
-    patch = FancyBboxPatch((x, y), w, h, boxstyle='round,pad=0.04,rounding_size=0.08',
-                           linewidth=1.3, edgecolor='#24445c', facecolor=color)
-    ax.add_patch(patch); ax.text(x+w/2, y+h/2, text, ha='center', va='center', fontsize=9)
-def arrow(x1, y1, x2, y2):
-    ax.add_patch(FancyArrowPatch((x1,y1),(x2,y2), arrowstyle='-|>', mutation_scale=13,
-                                 linewidth=1.2, color='#24445c'))
-
-box(0.3, 5.4, 2.0, 0.85, 'Three visual domains\\nlocked splits', '#e8f2f8')
-box(3.0, 5.4, 2.2, 0.85, 'Frozen DINOv2\\nViT-S/14', '#e8f2f8')
-box(5.9, 5.4, 2.0, 0.85, 'Cached 384D\\nCLS vectors', '#e8f2f8')
-arrow(2.3,5.82,3.0,5.82); arrow(5.2,5.82,5.9,5.82)
-
-reducers = [('PCA-6',0.3),('LDA-6',3.0),('NCA-6',5.7),('SLP-6',8.4)]
-for name,x in reducers:
-    box(x,3.55,2.0,0.75,name,'#fff1d3'); arrow(6.9,5.4,x+1.0,4.3)
-box(4.7,2.25,2.6,0.8,'Identical scaled 6D\\nπ tanh(z)', '#e8f6ed')
-for _,x in reducers: arrow(x+1.0,3.55,6.0,3.05)
-heads = [('LR',0.5),('RBF-SVM',3.0),('Matched MLP',5.5),('6-qubit VQC',8.0)]
-for name,x in heads:
-    box(x,0.55,2.0,0.75,name,'#eee9f8'); arrow(6.0,2.25,x+1.0,1.3)
-ax.text(11.4, 3.0, '384D RBF reference\\nquantifies compression loss', ha='right', va='center', fontsize=9,
-        bbox=dict(boxstyle='round,pad=0.35', facecolor='#f5f5f5', edgecolor='#666'))
-ax.set_title('Controlled reducer × head factorial design', fontsize=13, weight='bold', pad=8)
-save_figure(fig, 'figure_01_pipeline')
-plt.show()
+drawio_source = FIG / 'figure_01_pipeline.drawio'
+pipeline_svg = FIG / 'figure_01_pipeline.svg'
+assert drawio_source.exists() and pipeline_svg.exists()
+display(SVG(filename=str(pipeline_svg)))
+print(f'Editable draw.io source: {drawio_source.relative_to(ROOT)}')
 """
         ),
         _markdown("## Dataset audit and sample montage"),
@@ -224,7 +200,9 @@ for ax,(_,choice) in zip(axes,ranked.iterrows()):
     seed_row = candidates.loc[representative_index]
     pred = pd.read_parquet(ROOT/'runs'/seed_row['run_id']/'predictions.parquet')
     matrix = confusion_matrix(pred.true_label,pred.predicted_label,normalize='true')
-    sns.heatmap(matrix,cmap='Blues',vmin=0,vmax=1,ax=ax,cbar=ax is axes[-1])
+    annotations = np.where(matrix >= 0.005, np.vectorize(lambda value: f'{value:.2f}')(matrix), '')
+    sns.heatmap(matrix,annot=annotations,fmt='',annot_kws={'fontsize':5.8},cmap='Blues',vmin=0,vmax=1,
+                linewidths=.25,linecolor='white',square=True,ax=ax,cbar=ax is axes[-1])
     ax.set_title(f"{choice['dataset']}: {choice['reducer']} + {choice['head']}"); ax.set_xlabel('Predicted'); ax.set_ylabel('True')
     selected_runs.append(seed_row['run_id'])
 fig.suptitle('Normalized test confusion matrices for validation-selected configurations',fontsize=12.5,weight='bold')

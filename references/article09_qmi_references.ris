@@ -1,0 +1,372 @@
+TY  - JOUR
+ID  - ABBAS-2021
+AU  - Abbas A
+AU  - Sutter D
+AU  - Zoufal C
+AU  - Lucchi A
+AU  - Figalli A
+AU  - Woerner S
+PY  - 2021
+TI  - The power of quantum neural networks
+JO  - Nature Computational Science 1:403-409
+DO  - 10.1038/s43588-021-00084-1
+UR  - https://doi.org/10.1038/s43588-021-00084-1
+N1  - Imported for Article 09 QMI manuscript; citation key ABBAS-2021
+ER  - 
+
+TY  - JOUR
+ID  - BALDI-HORNIK-1989
+AU  - Baldi P
+AU  - Hornik K
+PY  - 1989
+TI  - Neural networks and principal component analysis
+JO  - Neural Networks 2(1):53-58
+DO  - 10.1016/0893-6080(89)90014-2
+UR  - https://doi.org/10.1016/0893-6080(89)90014-2
+N1  - Imported for Article 09 QMI manuscript; citation key BALDI-HORNIK-1989
+ER  - 
+
+TY  - JOUR
+ID  - CARO-2022
+AU  - Caro MC
+AU  - Huang HY
+AU  - Cerezo M
+AU  - Sharma K
+AU  - Sornborger A
+AU  - Cincio L
+AU  - Coles PJ
+PY  - 2022
+TI  - Generalization in quantum machine learning from few training data
+JO  - Nature Communications 13:4919
+DO  - 10.1038/s41467-022-32550-3
+UR  - https://doi.org/10.1038/s41467-022-32550-3
+N1  - Imported for Article 09 QMI manuscript; citation key CARO-2022
+ER  - 
+
+TY  - JOUR
+ID  - CEREZO-VQA-2021
+AU  - Cerezo M
+AU  - others
+PY  - 2021
+TI  - Variational quantum algorithms
+JO  - Nature Reviews Physics 3:625-644
+DO  - 10.1038/s42254-021-00348-9
+UR  - https://doi.org/10.1038/s42254-021-00348-9
+N1  - Imported for Article 09 QMI manuscript; citation key CEREZO-VQA-2021
+ER  - 
+
+TY  - JOUR
+ID  - CEREZO-CHALLENGES-2022
+AU  - Cerezo M
+AU  - Verdon G
+AU  - Huang HY
+AU  - Cincio L
+AU  - Coles PJ
+PY  - 2022
+TI  - Challenges and opportunities in quantum machine learning
+JO  - Nature Computational Science 2:567-576
+DO  - 10.1038/s43588-022-00311-3
+UR  - https://doi.org/10.1038/s43588-022-00311-3
+N1  - Imported for Article 09 QMI manuscript; citation key CEREZO-CHALLENGES-2022
+ER  - 
+
+TY  - JOUR
+ID  - DEMSAR-2006
+AU  - Demsar J
+PY  - 2006
+TI  - Statistical comparisons of classifiers over multiple data sets
+JO  - Journal of Machine Learning Research 7:1-30
+N1  - Imported for Article 09 QMI manuscript; citation key DEMSAR-2006
+ER  - 
+
+TY  - JOUR
+ID  - DU-2021
+AU  - Du Y
+AU  - Hsieh MH
+AU  - Liu T
+AU  - You S
+AU  - Tao D
+PY  - 2021
+TI  - Learnability of quantum neural networks
+JO  - PRX Quantum 2:040337
+DO  - 10.1103/PRXQuantum.2.040337
+UR  - https://doi.org/10.1103/PRXQuantum.2.040337
+N1  - Imported for Article 09 QMI manuscript; citation key DU-2021
+ER  - 
+
+TY  - JOUR
+ID  - EFRON-TIBSHIRANI-1993
+AU  - Efron B
+AU  - Tibshirani RJ
+PY  - 1993
+TI  - An Introduction to the Bootstrap
+JO  - Chapman and Hall, New York
+N1  - Imported for Article 09 QMI manuscript; citation key EFRON-TIBSHIRANI-1993
+ER  - 
+
+TY  - JOUR
+ID  - EGGINGER-2024
+AU  - Egginger S
+AU  - Sakhnenko A
+AU  - Lorenz JM
+PY  - 2024
+TI  - A hyperparameter study for quantum kernel methods
+JO  - Quantum Machine Intelligence 6:44
+DO  - 10.1007/s42484-024-00172-1
+UR  - https://doi.org/10.1007/s42484-024-00172-1
+N1  - Imported for Article 09 QMI manuscript; citation key EGGINGER-2024
+ER  - 
+
+TY  - JOUR
+ID  - GIL-FUSTER-2024
+AU  - Gil-Fuster E
+AU  - Eisert J
+AU  - Bravo-Prieto C
+PY  - 2024
+TI  - Understanding quantum machine learning also requires rethinking generalization
+JO  - Nature Communications 15:2277
+DO  - 10.1038/s41467-024-45882-z
+UR  - https://doi.org/10.1038/s41467-024-45882-z
+N1  - Imported for Article 09 QMI manuscript; citation key GIL-FUSTER-2024
+ER  - 
+
+TY  - JOUR
+ID  - GNEITING-RAFTERY-2007
+AU  - Gneiting T
+AU  - Raftery AE
+PY  - 2007
+TI  - Strictly proper scoring rules, prediction, and estimation
+JO  - Journal of the American Statistical Association 102(477):359-378
+DO  - 10.1198/016214506000001437
+UR  - https://doi.org/10.1198/016214506000001437
+N1  - Imported for Article 09 QMI manuscript; citation key GNEITING-RAFTERY-2007
+ER  - 
+
+TY  - JOUR
+ID  - GOLDBERGER-2004
+AU  - Goldberger J
+AU  - Hinton GE
+AU  - Roweis S
+AU  - Salakhutdinov RR
+PY  - 2004
+TI  - Neighbourhood components analysis
+JO  - Advances in Neural Information Processing Systems 17
+N1  - Imported for Article 09 QMI manuscript; citation key GOLDBERGER-2004
+ER  - 
+
+TY  - JOUR
+ID  - GUO-2017
+AU  - Guo C
+AU  - Pleiss G
+AU  - Sun Y
+AU  - Weinberger KQ
+PY  - 2017
+TI  - On calibration of modern neural networks
+JO  - Proceedings of the 34th International Conference on Machine Learning, pp 1321-1330
+N1  - Imported for Article 09 QMI manuscript; citation key GUO-2017
+ER  - 
+
+TY  - JOUR
+ID  - HAVLICEK-2019
+AU  - Havlicek V
+AU  - others
+PY  - 2019
+TI  - Supervised learning with quantum-enhanced feature spaces
+JO  - Nature 567:209-212
+DO  - 10.1038/s41586-019-0980-2
+UR  - https://doi.org/10.1038/s41586-019-0980-2
+N1  - Imported for Article 09 QMI manuscript; citation key HAVLICEK-2019
+ER  - 
+
+TY  - JOUR
+ID  - HELBER-2019
+AU  - Helber P
+AU  - Bischke B
+AU  - Dengel A
+AU  - Borth D
+PY  - 2019
+TI  - EuroSAT: A novel dataset and deep learning benchmark for land use and land cover classification
+JO  - IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing 12(7):2217-2226
+DO  - 10.1109/JSTARS.2019.2918242
+UR  - https://doi.org/10.1109/JSTARS.2019.2918242
+N1  - Imported for Article 09 QMI manuscript; citation key HELBER-2019
+ER  - 
+
+TY  - JOUR
+ID  - HOLM-1979
+AU  - Holm S
+PY  - 1979
+TI  - A simple sequentially rejective multiple test procedure
+JO  - Scandinavian Journal of Statistics 6(2):65-70
+N1  - Imported for Article 09 QMI manuscript; citation key HOLM-1979
+ER  - 
+
+TY  - JOUR
+ID  - HUANG-2021
+AU  - Huang HY
+AU  - Broughton M
+AU  - Mohseni M
+AU  - Babbush R
+AU  - Boixo S
+AU  - Neven H
+AU  - McClean JR
+PY  - 2021
+TI  - Power of data in quantum machine learning
+JO  - Nature Communications 12:2631
+DO  - 10.1038/s41467-021-22539-9
+UR  - https://doi.org/10.1038/s41467-021-22539-9
+N1  - Imported for Article 09 QMI manuscript; citation key HUANG-2021
+ER  - 
+
+TY  - JOUR
+ID  - KRIZHEVSKY-2009
+AU  - Krizhevsky A
+PY  - 2009
+TI  - Learning multiple layers of features from tiny images
+JO  - Technical report, University of Toronto
+N1  - Imported for Article 09 QMI manuscript; citation key KRIZHEVSKY-2009
+ER  - 
+
+TY  - JOUR
+ID  - MANGINI-2022
+AU  - Mangini S
+AU  - Marruzzo A
+AU  - Piantanida M
+AU  - Gerace D
+AU  - Bajoni D
+AU  - Macchiavello C
+PY  - 2022
+TI  - Quantum neural network autoencoder and classifier applied to an industrial case study
+JO  - Quantum Machine Intelligence 4:13
+DO  - 10.1007/s42484-022-00070-4
+UR  - https://doi.org/10.1007/s42484-022-00070-4
+N1  - Imported for Article 09 QMI manuscript; citation key MANGINI-2022
+ER  - 
+
+TY  - JOUR
+ID  - MARI-2020
+AU  - Mari A
+AU  - Bromley TR
+AU  - Izaac J
+AU  - Schuld M
+AU  - Killoran N
+PY  - 2020
+TI  - Transfer learning in hybrid classical-quantum neural networks
+JO  - Quantum 4:340
+DO  - 10.22331/q-2020-10-09-340
+UR  - https://doi.org/10.22331/q-2020-10-09-340
+N1  - Imported for Article 09 QMI manuscript; citation key MARI-2020
+ER  - 
+
+TY  - JOUR
+ID  - ODAGIU-2025
+AU  - Odagiu P
+AU  - others
+PY  - 2025
+TI  - Learning reduced representations for quantum classifiers
+JO  - Quantum Machine Intelligence 7:113
+DO  - 10.1007/s42484-025-00331-y
+UR  - https://doi.org/10.1007/s42484-025-00331-y
+N1  - Imported for Article 09 QMI manuscript; citation key ODAGIU-2025
+ER  - 
+
+TY  - JOUR
+ID  - DINOV2-2024
+AU  - Oquab M
+AU  - others
+PY  - 2024
+TI  - DINOv2: Learning robust visual features without supervision
+JO  - Transactions on Machine Learning Research
+N1  - Imported for Article 09 QMI manuscript; citation key DINOV2-2024
+ER  - 
+
+TY  - JOUR
+ID  - PEREZ-SALINAS-2020
+AU  - Perez-Salinas A
+AU  - Cervera-Lierta A
+AU  - Gil-Fuster E
+AU  - Latorre JI
+PY  - 2020
+TI  - Data re-uploading for a universal quantum classifier
+JO  - Quantum 4:226
+DO  - 10.22331/q-2020-02-06-226
+UR  - https://doi.org/10.22331/q-2020-02-06-226
+N1  - Imported for Article 09 QMI manuscript; citation key PEREZ-SALINAS-2020
+ER  - 
+
+TY  - JOUR
+ID  - SCHNABEL-ROTH-2025
+AU  - Schnabel J
+AU  - Roth M
+PY  - 2025
+TI  - Quantum kernel methods under scrutiny: a benchmarking study
+JO  - Quantum Machine Intelligence 7:58
+DO  - 10.1007/s42484-025-00273-5
+UR  - https://doi.org/10.1007/s42484-025-00273-5
+N1  - Imported for Article 09 QMI manuscript; citation key SCHNABEL-ROTH-2025
+ER  - 
+
+TY  - JOUR
+ID  - SCHULD-KILLORAN-2019
+AU  - Schuld M
+AU  - Killoran N
+PY  - 2019
+TI  - Quantum machine learning in feature Hilbert spaces
+JO  - Physical Review Letters 122:040504
+DO  - 10.1103/PhysRevLett.122.040504
+UR  - https://doi.org/10.1103/PhysRevLett.122.040504
+N1  - Imported for Article 09 QMI manuscript; citation key SCHULD-KILLORAN-2019
+ER  - 
+
+TY  - JOUR
+ID  - SCHULD-SWEKE-MEYER-2021
+AU  - Schuld M
+AU  - Sweke R
+AU  - Meyer JJ
+PY  - 2021
+TI  - Effect of data encoding on the expressive power of variational quantum-machine-learning models
+JO  - Physical Review A 103:032430
+DO  - 10.1103/PhysRevA.103.032430
+UR  - https://doi.org/10.1103/PhysRevA.103.032430
+N1  - Imported for Article 09 QMI manuscript; citation key SCHULD-SWEKE-MEYER-2021
+ER  - 
+
+TY  - JOUR
+ID  - THANASILP-2024
+AU  - Thanasilp S
+AU  - Wang S
+AU  - Cerezo M
+AU  - Holmes Z
+PY  - 2024
+TI  - Exponential concentration in quantum kernel methods
+JO  - Nature Communications 15:5200
+DO  - 10.1038/s41467-024-49287-w
+UR  - https://doi.org/10.1038/s41467-024-49287-w
+N1  - Imported for Article 09 QMI manuscript; citation key THANASILP-2024
+ER  - 
+
+TY  - JOUR
+ID  - WANG-2025
+AU  - Wang P
+AU  - Myers CR
+AU  - Hollenberg LCL
+AU  - Parampalli U
+PY  - 2025
+TI  - Quantum Hamiltonian embedding of images for data reuploading classifiers
+JO  - Quantum Machine Intelligence 7:35
+DO  - 10.1007/s42484-025-00247-7
+UR  - https://doi.org/10.1007/s42484-025-00247-7
+N1  - Imported for Article 09 QMI manuscript; citation key WANG-2025
+ER  - 
+
+TY  - JOUR
+ID  - MEDMNIST-2023
+AU  - Yang J
+AU  - others
+PY  - 2023
+TI  - MedMNIST v2: A large-scale lightweight benchmark for 2D and 3D biomedical image classification
+JO  - Scientific Data 10:41
+DO  - 10.1038/s41597-022-01721-8
+UR  - https://doi.org/10.1038/s41597-022-01721-8
+N1  - Imported for Article 09 QMI manuscript; citation key MEDMNIST-2023
+ER  - 

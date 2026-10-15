@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import zipfile
@@ -30,7 +31,39 @@ DOC_SKILL = Path(
 )
 
 
-def _set_font(run, name: str = "Times New Roman", size: float = 9.5, bold: bool | None = None):
+CITATION_PATTERNS = [
+    (r"schul[d]? and killoran.*2019", "SCHULD-KILLORAN-2019"),
+    (r"schuld et al.*2021", "SCHULD-SWEKE-MEYER-2021"),
+    (r"havlicek.*2019", "HAVLICEK-2019"),
+    (r"perez-salinas.*2020", "PEREZ-SALINAS-2020"),
+    (r"mari et al.*2020", "MARI-2020"),
+    (r"abbas et al.*2021", "ABBAS-2021"),
+    (r"cerezo et al.*2021", "CEREZO-VQA-2021"),
+    (r"cerezo et al.*2022", "CEREZO-CHALLENGES-2022"),
+    (r"du et al.*2021", "DU-2021"),
+    (r"caro et al.*2022", "CARO-2022"),
+    (r"gil-fuster.*2024", "GIL-FUSTER-2024"),
+    (r"oquab.*2024", "DINOV2-2024"),
+    (r"huang.*2021", "HUANG-2021"),
+    (r"egginger.*2024", "EGGINGER-2024"),
+    (r"schnabel and roth.*2025", "SCHNABEL-ROTH-2025"),
+    (r"mangini.*2022", "MANGINI-2022"),
+    (r"wang.*2025", "WANG-2025"),
+    (r"odagiu.*2025", "ODAGIU-2025"),
+    (r"krizhevsky.*2009", "KRIZHEVSKY-2009"),
+    (r"helber.*2019", "HELBER-2019"),
+    (r"yang.*2023", "MEDMNIST-2023"),
+    (r"goldberger.*2004", "GOLDBERGER-2004"),
+    (r"demsar.*2006", "DEMSAR-2006"),
+    (r"holm.*1979", "HOLM-1979"),
+    (r"efron and tibshirani.*1993", "EFRON-TIBSHIRANI-1993"),
+    (r"guo et al.*2017", "GUO-2017"),
+    (r"gneiting and raftery.*2007", "GNEITING-RAFTERY-2007"),
+    (r"thanasilp.*2024", "THANASILP-2024"),
+]
+
+
+def _set_font(run, name: str = "Times New Roman", size: float = 10.0, bold: bool | None = None):
     run.font.name = name
     run._element.get_or_add_rPr().rFonts.set(qn("w:ascii"), name)
     run._element.get_or_add_rPr().rFonts.set(qn("w:hAnsi"), name)
@@ -102,7 +135,7 @@ def _format_table(table):
                 paragraph.paragraph_format.space_after = Pt(1)
                 paragraph.paragraph_format.space_before = Pt(1)
                 for run in paragraph.runs:
-                    _set_font(run, name="Arial", size=7.5, bold=row_index == 0)
+                    _set_font(run, size=8.5, bold=row_index == 0)
                     run.font.color.rgb = RGBColor(0, 0, 0)
 
 
@@ -113,14 +146,15 @@ def _add_table(doc: Document, headers: list[str], rows: list[list[str]], caption
     paragraph.paragraph_format.space_before = Pt(5)
     paragraph.paragraph_format.space_after = Pt(3)
     run = paragraph.add_run(caption)
-    _set_font(run, name="Arial", size=8.5, bold=True)
+    _set_font(run, name="Arial Narrow", size=8.5, bold=True)
     table = doc.add_table(rows=1, cols=len(headers))
     for index, header in enumerate(headers):
         table.rows[0].cells[index].text = header
     for values in rows:
         cells = table.add_row().cells
         for index, value in enumerate(values):
-            cells[index].text = str(value)
+            paragraph = cells[index].paragraphs[0]
+            _append_text_with_citations(paragraph, str(value), size=8.5)
     _format_table(table)
     return table
 
@@ -137,6 +171,46 @@ def _add_omml_equation(doc: Document, text: str):
     math.append(run)
     math_para.append(math)
     paragraph._p.append(math_para)
+
+
+def _add_mendeley_bibliography(doc: Document, references: list[str]):
+    paragraph = doc.add_paragraph()
+    paragraph.paragraph_format.left_indent = Inches(0.18)
+    paragraph.paragraph_format.first_line_indent = Inches(-0.18)
+    paragraph.paragraph_format.space_after = Pt(0)
+
+    begin_run = OxmlElement("w:r")
+    begin = OxmlElement("w:fldChar")
+    begin.set(qn("w:fldCharType"), "begin")
+    begin.set(qn("w:dirty"), "true")
+    begin_run.append(begin)
+    paragraph._p.append(begin_run)
+
+    instruction_run = OxmlElement("w:r")
+    instruction = OxmlElement("w:instrText")
+    instruction.set(qn("xml:space"), "preserve")
+    instruction.text = " ADDIN Mendeley Bibliography CSL_BIBLIOGRAPHY "
+    instruction_run.append(instruction)
+    paragraph._p.append(instruction_run)
+
+    separate_run = OxmlElement("w:r")
+    separate = OxmlElement("w:fldChar")
+    separate.set(qn("w:fldCharType"), "separate")
+    separate_run.append(separate)
+    paragraph._p.append(separate_run)
+
+    for index, reference in enumerate(references):
+        run = paragraph.add_run(reference)
+        _set_font(run, size=8.5)
+        if index != len(references) - 1:
+            run.add_break()
+
+    end_run = OxmlElement("w:r")
+    end = OxmlElement("w:fldChar")
+    end.set(qn("w:fldCharType"), "end")
+    end_run.append(end)
+    paragraph._p.append(end_run)
+    return paragraph
 
 
 def _remove_paragraph_border(paragraph):
@@ -185,12 +259,13 @@ def _set_columns(section, count: int):
 
 
 def _configure_section(section, columns: int = 1):
-    section.page_width = Inches(8.27)
-    section.page_height = Inches(11.69)
-    section.top_margin = Inches(0.67)
-    section.bottom_margin = Inches(0.67)
-    section.left_margin = Inches(0.67)
-    section.right_margin = Inches(0.67)
+    # Measured from the supplied published QMI reference: 595.276 x 790.866 pt.
+    section.page_width = Inches(595.276 / 72)
+    section.page_height = Inches(790.866 / 72)
+    section.top_margin = Inches(0.47)
+    section.bottom_margin = Inches(0.48)
+    section.left_margin = Inches(51.024 / 72)
+    section.right_margin = Inches(51.024 / 72)
     _set_columns(section, columns)
 
 
@@ -239,6 +314,70 @@ def _add_hyperlink(paragraph, text: str, url: str, size: float = 9.0):
     return hyperlink
 
 
+def _citation_ids(shown: str) -> list[str]:
+    normalized = shown.lower().replace("–", "-")
+    found = []
+    for pattern, citation_id in CITATION_PATTERNS:
+        if re.search(pattern, normalized) and citation_id not in found:
+            found.append(citation_id)
+    return found
+
+
+def _add_mendeley_citation(paragraph, shown: str, ids: list[str], name: str, size: float):
+    begin_run = OxmlElement("w:r")
+    begin = OxmlElement("w:fldChar")
+    begin.set(qn("w:fldCharType"), "begin")
+    begin.set(qn("w:dirty"), "true")
+    begin_run.append(begin)
+    paragraph._p.append(begin_run)
+
+    instruction_run = OxmlElement("w:r")
+    instruction = OxmlElement("w:instrText")
+    instruction.set(qn("xml:space"), "preserve")
+    payload = {
+        "citationItems": [{"id": item} for item in ids],
+        "properties": {"formattedCitation": shown, "plainCitation": shown, "noteIndex": 0},
+        "schema": "https://github.com/citation-style-language/schema/raw/master/csl-citation.json",
+    }
+    instruction.text = " ADDIN CSL_CITATION " + json.dumps(payload, separators=(",", ":")) + " "
+    instruction_run.append(instruction)
+    paragraph._p.append(instruction_run)
+
+    separate_run = OxmlElement("w:r")
+    separate = OxmlElement("w:fldChar")
+    separate.set(qn("w:fldCharType"), "separate")
+    separate_run.append(separate)
+    paragraph._p.append(separate_run)
+
+    visible = paragraph.add_run(shown)
+    _set_font(visible, name=name, size=size)
+
+    end_run = OxmlElement("w:r")
+    end = OxmlElement("w:fldChar")
+    end.set(qn("w:fldCharType"), "end")
+    end_run.append(end)
+    paragraph._p.append(end_run)
+
+
+def _append_text_with_citations(paragraph, text: str, name: str = "Times New Roman", size: float = 10.0):
+    cursor = 0
+    for match in re.finditer(r"\([^()]*?(?:19|20)\d{2}[^()]*?\)", text):
+        if match.start() > cursor:
+            run = paragraph.add_run(text[cursor : match.start()])
+            _set_font(run, name=name, size=size)
+        shown = match.group(0)
+        ids = _citation_ids(shown)
+        if ids:
+            _add_mendeley_citation(paragraph, shown, ids, name, size)
+        else:
+            run = paragraph.add_run(shown)
+            _set_font(run, name=name, size=size)
+        cursor = match.end()
+    if cursor < len(text):
+        run = paragraph.add_run(text[cursor:])
+        _set_font(run, name=name, size=size)
+
+
 def _add_figure(doc: Document, stem: str, caption: str, width: float = 6.5):
     path = ROOT / "results" / "figures" / f"{stem}.png"
     if not path.exists():
@@ -252,8 +391,15 @@ def _add_figure(doc: Document, stem: str, caption: str, width: float = 6.5):
     caption_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
     caption_paragraph.paragraph_format.keep_together = True
     caption_paragraph.paragraph_format.space_after = Pt(4)
-    run = caption_paragraph.add_run(caption)
-    _set_font(run, name="Arial", size=8)
+    match = re.match(r"(Figure\s+\d+)\s+(.*)", caption)
+    if match:
+        label = caption_paragraph.add_run(match.group(1) + " ")
+        _set_font(label, name="Arial Narrow", size=8.5, bold=True)
+        body = caption_paragraph.add_run(match.group(2))
+        _set_font(body, size=8.5)
+    else:
+        run = caption_paragraph.add_run(caption)
+        _set_font(run, size=8.5)
 
 
 def _paragraph(doc: Document, text: str, bold_lead: str | None = None):
@@ -264,11 +410,9 @@ def _paragraph(doc: Document, text: str, bold_lead: str | None = None):
     if bold_lead and text.startswith(bold_lead):
         lead = paragraph.add_run(bold_lead)
         _set_font(lead, bold=True)
-        rest = paragraph.add_run(text[len(bold_lead) :])
-        _set_font(rest)
+        _append_text_with_citations(paragraph, text[len(bold_lead) :])
     else:
-        run = paragraph.add_run(text)
-        _set_font(run)
+        _append_text_with_citations(paragraph, text)
     return paragraph
 
 
@@ -357,6 +501,11 @@ REFERENCES = [
 def build_manuscript(output: Path) -> None:
     result = _result_narrative()
     doc = Document()
+    update_fields = doc.settings.element.find(qn("w:updateFields"))
+    if update_fields is None:
+        update_fields = OxmlElement("w:updateFields")
+        doc.settings.element.append(update_fields)
+    update_fields.set(qn("w:val"), "true")
     doc.core_properties.title = (
         "Disentangling Representation Compression and Quantum-Head Effects in Multi-Domain Quantum Transfer Learning"
     )
@@ -370,17 +519,17 @@ def build_manuscript(output: Path) -> None:
     styles["Normal"].font.name = "Times New Roman"
     styles["Normal"]._element.rPr.rFonts.set(qn("w:ascii"), "Times New Roman")
     styles["Normal"]._element.rPr.rFonts.set(qn("w:hAnsi"), "Times New Roman")
-    styles["Normal"].font.size = Pt(9.5)
+    styles["Normal"].font.size = Pt(10)
     for style_name in ("Title", "Heading 1", "Heading 2", "Heading 3"):
         style = styles[style_name]
-        style.font.name = "Arial"
-        style._element.rPr.rFonts.set(qn("w:ascii"), "Arial")
-        style._element.rPr.rFonts.set(qn("w:hAnsi"), "Arial")
+        style.font.name = "Arial Narrow"
+        style._element.rPr.rFonts.set(qn("w:ascii"), "Arial Narrow")
+        style._element.rPr.rFonts.set(qn("w:hAnsi"), "Arial Narrow")
         style.font.color.rgb = RGBColor(0, 0, 0)
-    styles["Title"].font.size = Pt(15)
+    styles["Title"].font.size = Pt(16)
     styles["Heading 1"].font.size = Pt(11)
-    styles["Heading 2"].font.size = Pt(9.5)
-    styles["Heading 3"].font.size = Pt(9)
+    styles["Heading 2"].font.size = Pt(10)
+    styles["Heading 3"].font.size = Pt(10)
     for style_name in ("Heading 1", "Heading 2", "Heading 3"):
         styles[style_name].paragraph_format.keep_with_next = True
         styles[style_name].paragraph_format.space_before = Pt(7)
@@ -396,18 +545,18 @@ def build_manuscript(output: Path) -> None:
     run = title.add_run(
         "Disentangling Representation Compression and Quantum-Head Effects in Multi-Domain Quantum Transfer Learning"
     )
-    _set_font(run, name="Arial", size=15, bold=True)
+    _set_font(run, name="Arial Narrow", size=16, bold=True)
     authors = doc.add_paragraph()
     authors.alignment = WD_ALIGN_PARAGRAPH.LEFT
     run = authors.add_run("Fajri Yanuar Shiddiq Juanda")
-    _set_font(run, name="Arial", size=9.5, bold=True)
+    _set_font(run, name="Arial Narrow", size=10, bold=True)
     run = authors.add_run("1")
-    _set_font(run, name="Arial", size=7.5, bold=True)
+    _set_font(run, name="Arial Narrow", size=7, bold=True)
     run.font.superscript = True
     run = authors.add_run("*  ·  Kiki Ahmad Baihaqi")
-    _set_font(run, name="Arial", size=9.5, bold=True)
+    _set_font(run, name="Arial Narrow", size=10, bold=True)
     run = authors.add_run("1")
-    _set_font(run, name="Arial", size=7.5, bold=True)
+    _set_font(run, name="Arial Narrow", size=7, bold=True)
     run.font.superscript = True
     author_orcid = doc.add_paragraph()
     author_orcid.paragraph_format.space_after = Pt(1)
@@ -537,7 +686,7 @@ def build_manuscript(output: Path) -> None:
         "PCA-6 represented unsupervised variance preservation; LDA-6 represented supervised linear discrimination; NCA-6 represented supervised metric learning (Goldberger et al 2004); and SLP-6 used a learned 384-to-6 tanh bottleneck whose temporary classification layer was discarded. Each reducer was fitted on training data only. A second training-fitted standardizer mapped every reduced coordinate to an angle-compatible range.",
     )
     _add_omml_equation(doc, "x̃ⱼ = π tanh(zⱼ)")
-    _add_full_width_figure(doc, "figure_01_pipeline", "Figure 2 Controlled reducer by head factorial design generated by the analysis notebook")
+    _add_full_width_figure(doc, "figure_01_pipeline", "Figure 2 Controlled reducer-by-head factorial design; editable source prepared in draw.io")
 
     doc.add_heading("2.3 Classical and quantum heads", level=2)
     _paragraph(
@@ -638,7 +787,7 @@ def build_manuscript(output: Path) -> None:
         "Distance preservation, neighborhood trustworthiness, Fisher separation, and silhouette score were computed on the fixed validation subset. Their association with VQC macro-F1 indicates whether circuit behavior tracks the geometry delivered by the reducer rather than the reducer label alone.",
     )
     _add_full_width_figure(doc, "figure_05_representation_geometry", "Figure 5 Representation geometry in relation to VQC performance")
-    _add_full_width_figure(doc, "figure_06_confusion_matrices", "Figure 6 Normalized test confusion matrices selected without using test performance")
+    _add_full_width_figure(doc, "figure_06_confusion_matrices", "Figure 6 Row-normalized test confusion matrices selected without test-performance access; cell values are class-wise proportions generated by the executable notebook")
     _add_full_width_figure(doc, "figure_07_calibration", "Figure 7 Reliability diagrams for validation-selected configurations")
 
     doc.add_heading("3.3 Runtime", level=2)
@@ -690,13 +839,7 @@ def build_manuscript(output: Path) -> None:
     _paragraph(doc, "Funding. The authors received no specific funding for this work.")
     _paragraph(doc, "Competing interests. The authors declare that they have no competing interests.")
     doc.add_heading("References", level=1)
-    for reference in REFERENCES:
-        paragraph = doc.add_paragraph()
-        paragraph.paragraph_format.left_indent = Inches(0.22)
-        paragraph.paragraph_format.first_line_indent = Inches(-0.22)
-        paragraph.paragraph_format.space_after = Pt(1.5)
-        run = paragraph.add_run(reference)
-        _set_font(run, size=8)
+    _add_mendeley_bibliography(doc, REFERENCES)
 
     output.parent.mkdir(parents=True, exist_ok=True)
     doc.save(output)
