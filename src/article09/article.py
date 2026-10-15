@@ -173,11 +173,41 @@ def _add_omml_equation(doc: Document, text: str):
     paragraph._p.append(math_para)
 
 
-def _add_mendeley_bibliography(doc: Document, references: list[str]):
-    paragraph = doc.add_paragraph()
+def _append_reference_with_links(paragraph, reference: str):
+    """Append a Springer-style reference with active DOI/URL hyperlinks."""
+    cursor = 0
+    for match in re.finditer(r"https?://\S+", reference):
+        if match.start() > cursor:
+            run = paragraph.add_run(reference[cursor : match.start()])
+            _set_font(run, size=8.5)
+        url = match.group(0).rstrip(".,;)")
+        trailing = match.group(0)[len(url) :]
+        _add_hyperlink(paragraph, url, url, size=8.5)
+        if trailing:
+            run = paragraph.add_run(trailing)
+            _set_font(run, size=8.5)
+        cursor = match.end()
+    if cursor < len(reference):
+        run = paragraph.add_run(reference[cursor:])
+        _set_font(run, size=8.5)
+
+
+def _format_reference_paragraph(paragraph):
+    paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     paragraph.paragraph_format.left_indent = Inches(0.18)
     paragraph.paragraph_format.first_line_indent = Inches(-0.18)
+    paragraph.paragraph_format.line_spacing = 1.0
+    paragraph.paragraph_format.space_before = Pt(0)
     paragraph.paragraph_format.space_after = Pt(0)
+    paragraph.paragraph_format.widow_control = True
+
+
+def _add_mendeley_bibliography(doc: Document, references: list[str]):
+    """Create one active Mendeley bibliography field spanning separate entries."""
+    if not references:
+        return None
+    paragraph = doc.add_paragraph()
+    _format_reference_paragraph(paragraph)
 
     begin_run = OxmlElement("w:r")
     begin = OxmlElement("w:fldChar")
@@ -200,10 +230,10 @@ def _add_mendeley_bibliography(doc: Document, references: list[str]):
     paragraph._p.append(separate_run)
 
     for index, reference in enumerate(references):
-        run = paragraph.add_run(reference)
-        _set_font(run, size=8.5)
-        if index != len(references) - 1:
-            run.add_break()
+        if index:
+            paragraph = doc.add_paragraph()
+            _format_reference_paragraph(paragraph)
+        _append_reference_with_links(paragraph, reference)
 
     end_run = OxmlElement("w:r")
     end = OxmlElement("w:fldChar")
@@ -402,9 +432,16 @@ def _add_figure(doc: Document, stem: str, caption: str, width: float = 6.5):
         _set_font(run, size=8.5)
 
 
-def _paragraph(doc: Document, text: str, bold_lead: str | None = None):
+def _paragraph(
+    doc: Document,
+    text: str,
+    bold_lead: str | None = None,
+    *,
+    first_line_indent: bool = True,
+):
     paragraph = doc.add_paragraph()
-    paragraph.paragraph_format.first_line_indent = Inches(0.25)
+    paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    paragraph.paragraph_format.first_line_indent = Inches(0.25 if first_line_indent else 0)
     paragraph.paragraph_format.line_spacing = 1.0
     paragraph.paragraph_format.space_after = Pt(3)
     if bold_lead and text.startswith(bold_lead):
@@ -466,35 +503,35 @@ def _result_narrative() -> dict:
 
 
 REFERENCES = [
-    "Abbas A, Sutter D, Zoufal C, Lucchi A, Figalli A, Woerner S (2021) The power of quantum neural networks. Nature Computational Science 1:403-409. https://doi.org/10.1038/s43588-021-00084-1",
-    "Baldi P, Hornik K (1989) Neural networks and principal component analysis. Neural Networks 2(1):53-58. https://doi.org/10.1016/0893-6080(89)90014-2",
-    "Caro MC, Huang HY, Cerezo M, Sharma K, Sornborger A, Cincio L, Coles PJ (2022) Generalization in quantum machine learning from few training data. Nature Communications 13:4919. https://doi.org/10.1038/s41467-022-32550-3",
-    "Cerezo M et al (2021) Variational quantum algorithms. Nature Reviews Physics 3:625-644. https://doi.org/10.1038/s42254-021-00348-9",
-    "Cerezo M, Verdon G, Huang HY, Cincio L, Coles PJ (2022) Challenges and opportunities in quantum machine learning. Nature Computational Science 2:567-576. https://doi.org/10.1038/s43588-022-00311-3",
-    "Demsar J (2006) Statistical comparisons of classifiers over multiple data sets. Journal of Machine Learning Research 7:1-30",
+    "Abbas A, Sutter D, Zoufal C, Lucchi A, Figalli A, Woerner S (2021) The power of quantum neural networks. Nat Comput Sci 1:403-409. https://doi.org/10.1038/s43588-021-00084-1",
+    "Baldi P, Hornik K (1989) Neural networks and principal component analysis. Neural Netw 2(1):53-58. https://doi.org/10.1016/0893-6080(89)90014-2",
+    "Caro MC, Huang HY, Cerezo M, Sharma K, Sornborger A, Cincio L, Coles PJ (2022) Generalization in quantum machine learning from few training data. Nat Commun 13:4919. https://doi.org/10.1038/s41467-022-32550-3",
+    "Cerezo M et al (2021) Variational quantum algorithms. Nat Rev Phys 3:625-644. https://doi.org/10.1038/s42254-021-00348-9",
+    "Cerezo M, Verdon G, Huang HY, Cincio L, Coles PJ (2022) Challenges and opportunities in quantum machine learning. Nat Comput Sci 2:567-576. https://doi.org/10.1038/s43588-022-00311-3",
+    "Demsar J (2006) Statistical comparisons of classifiers over multiple data sets. J Mach Learn Res 7:1-30",
     "Du Y, Hsieh MH, Liu T, You S, Tao D (2021) Learnability of quantum neural networks. PRX Quantum 2:040337. https://doi.org/10.1103/PRXQuantum.2.040337",
     "Efron B, Tibshirani RJ (1993) An Introduction to the Bootstrap. Chapman and Hall, New York",
-    "Egginger S, Sakhnenko A, Lorenz JM (2024) A hyperparameter study for quantum kernel methods. Quantum Machine Intelligence 6:44. https://doi.org/10.1007/s42484-024-00172-1",
-    "Gil-Fuster E, Eisert J, Bravo-Prieto C (2024) Understanding quantum machine learning also requires rethinking generalization. Nature Communications 15:2277. https://doi.org/10.1038/s41467-024-45882-z",
-    "Gneiting T, Raftery AE (2007) Strictly proper scoring rules, prediction, and estimation. Journal of the American Statistical Association 102(477):359-378. https://doi.org/10.1198/016214506000001437",
-    "Goldberger J, Hinton GE, Roweis S, Salakhutdinov RR (2004) Neighbourhood components analysis. Advances in Neural Information Processing Systems 17",
+    "Egginger S, Sakhnenko A, Lorenz JM (2024) A hyperparameter study for quantum kernel methods. Quantum Mach Intell 6:44. https://doi.org/10.1007/s42484-024-00172-1",
+    "Gil-Fuster E, Eisert J, Bravo-Prieto C (2024) Understanding quantum machine learning also requires rethinking generalization. Nat Commun 15:2277. https://doi.org/10.1038/s41467-024-45882-z",
+    "Gneiting T, Raftery AE (2007) Strictly proper scoring rules, prediction, and estimation. J Am Stat Assoc 102(477):359-378. https://doi.org/10.1198/016214506000001437",
+    "Goldberger J, Hinton GE, Roweis S, Salakhutdinov RR (2004) Neighbourhood components analysis. Adv Neural Inf Process Syst 17",
     "Guo C, Pleiss G, Sun Y, Weinberger KQ (2017) On calibration of modern neural networks. Proceedings of the 34th International Conference on Machine Learning, pp 1321-1330",
     "Havlicek V et al (2019) Supervised learning with quantum-enhanced feature spaces. Nature 567:209-212. https://doi.org/10.1038/s41586-019-0980-2",
-    "Helber P, Bischke B, Dengel A, Borth D (2019) EuroSAT: A novel dataset and deep learning benchmark for land use and land cover classification. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing 12(7):2217-2226. https://doi.org/10.1109/JSTARS.2019.2918242",
-    "Holm S (1979) A simple sequentially rejective multiple test procedure. Scandinavian Journal of Statistics 6(2):65-70",
-    "Huang HY, Broughton M, Mohseni M, Babbush R, Boixo S, Neven H, McClean JR (2021) Power of data in quantum machine learning. Nature Communications 12:2631. https://doi.org/10.1038/s41467-021-22539-9",
+    "Helber P, Bischke B, Dengel A, Borth D (2019) EuroSAT: A novel dataset and deep learning benchmark for land use and land cover classification. IEEE J Sel Top Appl Earth Obs Remote Sens 12(7):2217-2226. https://doi.org/10.1109/JSTARS.2019.2918242",
+    "Holm S (1979) A simple sequentially rejective multiple test procedure. Scand J Stat 6(2):65-70",
+    "Huang HY, Broughton M, Mohseni M, Babbush R, Boixo S, Neven H, McClean JR (2021) Power of data in quantum machine learning. Nat Commun 12:2631. https://doi.org/10.1038/s41467-021-22539-9",
     "Krizhevsky A (2009) Learning multiple layers of features from tiny images. Technical report, University of Toronto",
-    "Mangini S, Marruzzo A, Piantanida M, Gerace D, Bajoni D, Macchiavello C (2022) Quantum neural network autoencoder and classifier applied to an industrial case study. Quantum Machine Intelligence 4:13. https://doi.org/10.1007/s42484-022-00070-4",
+    "Mangini S, Marruzzo A, Piantanida M, Gerace D, Bajoni D, Macchiavello C (2022) Quantum neural network autoencoder and classifier applied to an industrial case study. Quantum Mach Intell 4:13. https://doi.org/10.1007/s42484-022-00070-4",
     "Mari A, Bromley TR, Izaac J, Schuld M, Killoran N (2020) Transfer learning in hybrid classical-quantum neural networks. Quantum 4:340. https://doi.org/10.22331/q-2020-10-09-340",
-    "Odagiu P et al (2025) Learning reduced representations for quantum classifiers. Quantum Machine Intelligence 7:113. https://doi.org/10.1007/s42484-025-00331-y",
-    "Oquab M et al (2024) DINOv2: Learning robust visual features without supervision. Transactions on Machine Learning Research",
+    "Odagiu P et al (2025) Learning reduced representations for quantum classifiers. Quantum Mach Intell 7:113. https://doi.org/10.1007/s42484-025-00331-y",
+    "Oquab M et al (2024) DINOv2: Learning robust visual features without supervision. Trans Mach Learn Res",
     "Perez-Salinas A, Cervera-Lierta A, Gil-Fuster E, Latorre JI (2020) Data re-uploading for a universal quantum classifier. Quantum 4:226. https://doi.org/10.22331/q-2020-02-06-226",
-    "Schnabel J, Roth M (2025) Quantum kernel methods under scrutiny: a benchmarking study. Quantum Machine Intelligence 7:58. https://doi.org/10.1007/s42484-025-00273-5",
-    "Schuld M, Killoran N (2019) Quantum machine learning in feature Hilbert spaces. Physical Review Letters 122:040504. https://doi.org/10.1103/PhysRevLett.122.040504",
-    "Schuld M, Sweke R, Meyer JJ (2021) Effect of data encoding on the expressive power of variational quantum-machine-learning models. Physical Review A 103:032430. https://doi.org/10.1103/PhysRevA.103.032430",
-    "Thanasilp S, Wang S, Cerezo M, Holmes Z (2024) Exponential concentration in quantum kernel methods. Nature Communications 15:5200. https://doi.org/10.1038/s41467-024-49287-w",
-    "Wang P, Myers CR, Hollenberg LCL, Parampalli U (2025) Quantum Hamiltonian embedding of images for data reuploading classifiers. Quantum Machine Intelligence 7:35. https://doi.org/10.1007/s42484-025-00247-7",
-    "Yang J et al (2023) MedMNIST v2: A large-scale lightweight benchmark for 2D and 3D biomedical image classification. Scientific Data 10:41. https://doi.org/10.1038/s41597-022-01721-8",
+    "Schnabel J, Roth M (2025) Quantum kernel methods under scrutiny: a benchmarking study. Quantum Mach Intell 7:58. https://doi.org/10.1007/s42484-025-00273-5",
+    "Schuld M, Killoran N (2019) Quantum machine learning in feature Hilbert spaces. Phys Rev Lett 122:040504. https://doi.org/10.1103/PhysRevLett.122.040504",
+    "Schuld M, Sweke R, Meyer JJ (2021) Effect of data encoding on the expressive power of variational quantum-machine-learning models. Phys Rev A 103:032430. https://doi.org/10.1103/PhysRevA.103.032430",
+    "Thanasilp S, Wang S, Cerezo M, Holmes Z (2024) Exponential concentration in quantum kernel methods. Nat Commun 15:5200. https://doi.org/10.1038/s41467-024-49287-w",
+    "Wang P, Myers CR, Hollenberg LCL, Parampalli U (2025) Quantum Hamiltonian embedding of images for data reuploading classifiers. Quantum Mach Intell 7:35. https://doi.org/10.1007/s42484-025-00247-7",
+    "Yang J et al (2023) MedMNIST v2: A large-scale lightweight benchmark for 2D and 3D biomedical image classification. Sci Data 10:41. https://doi.org/10.1038/s41597-022-01721-8",
 ]
 
 
@@ -506,6 +543,24 @@ def build_manuscript(output: Path) -> None:
         update_fields = OxmlElement("w:updateFields")
         doc.settings.element.append(update_fields)
     update_fields.set(qn("w:val"), "true")
+    # The published QMI layout relies on automatic hyphenation to keep fully
+    # justified two-column text from developing conspicuous word gaps.
+    settings = doc.settings.element
+    auto_hyphenation = settings.find(qn("w:autoHyphenation"))
+    if auto_hyphenation is None:
+        auto_hyphenation = OxmlElement("w:autoHyphenation")
+        settings.append(auto_hyphenation)
+    auto_hyphenation.set(qn("w:val"), "true")
+    hyphenation_zone = settings.find(qn("w:hyphenationZone"))
+    if hyphenation_zone is None:
+        hyphenation_zone = OxmlElement("w:hyphenationZone")
+        settings.append(hyphenation_zone)
+    hyphenation_zone.set(qn("w:val"), "180")
+    consecutive_hyphens = settings.find(qn("w:consecutiveHyphenLimit"))
+    if consecutive_hyphens is None:
+        consecutive_hyphens = OxmlElement("w:consecutiveHyphenLimit")
+        settings.append(consecutive_hyphens)
+    consecutive_hyphens.set(qn("w:val"), "2")
     doc.core_properties.title = (
         "Disentangling Representation Compression and Quantum-Head Effects in Multi-Domain Quantum Transfer Learning"
     )
@@ -603,7 +658,7 @@ def build_manuscript(output: Path) -> None:
         "These results locate the dominant bottleneck empirically rather than attributing every downstream difference to the quantum circuit. "
         "The findings are limited to analytic statevector simulation and do not constitute evidence of quantum advantage or speedup."
     )
-    _paragraph(doc, abstract)
+    _paragraph(doc, abstract, first_line_indent=False)
     keywords = doc.add_paragraph()
     lead = keywords.add_run("Keywords: ")
     _set_font(lead, bold=True)
@@ -841,31 +896,37 @@ def build_manuscript(output: Path) -> None:
         doc,
         "Supplementary Information. The supplementary material accompanying this submission contains the executable notebook with stored outputs, configuration files, split and artifact hashes, prediction-level outputs, model checkpoints, environment records, and editable figure sources.",
         bold_lead="Supplementary Information.",
+        first_line_indent=False,
     )
     _paragraph(
         doc,
         "Acknowledgements. The authors have no acknowledgements to declare.",
         bold_lead="Acknowledgements.",
+        first_line_indent=False,
     )
     _paragraph(
         doc,
         "Author Contributions. F.Y.S.J. contributed conceptualization, methodology, software, formal analysis, investigation, data curation, visualization, writing—original draft, and project administration. K.A.B. contributed supervision, validation, resources, and writing—review and editing. Both authors reviewed and approved the final manuscript.",
         bold_lead="Author Contributions.",
+        first_line_indent=False,
     )
     _paragraph(
         doc,
         "Funding. The authors received no specific funding for this work.",
         bold_lead="Funding.",
+        first_line_indent=False,
     )
     _paragraph(
         doc,
         "Data Availability. CIFAR-10, EuroSAT RGB, and PathMNIST are publicly available from the original repositories cited in the Methods. The exact split manifests, sample identifiers, audit reports, hashes, derived metrics, and prediction-level outputs used in this study are included in the supplementary reproducibility package and are available from the corresponding author.",
         bold_lead="Data Availability.",
+        first_line_indent=False,
     )
     _paragraph(
         doc,
         "Code Availability. The executable notebook, source code, configuration files, environment records, and trained artifacts are included in the supplementary reproducibility package. These materials will also be archived in a public repository upon acceptance.",
         bold_lead="Code Availability.",
+        first_line_indent=False,
     )
 
     doc.add_heading("Declarations", level=1)
@@ -873,11 +934,13 @@ def build_manuscript(output: Path) -> None:
         doc,
         "Competing Interests. The authors declare that they have no competing interests.",
         bold_lead="Competing Interests.",
+        first_line_indent=False,
     )
     _paragraph(
         doc,
         "Open Access. The authors request open-access publication under the Creative Commons Attribution 4.0 International License, subject to the journal's publication agreement. This license permits use, sharing, adaptation, distribution, and reproduction with appropriate credit, a link to the license, and an indication of any changes.",
         bold_lead="Open Access.",
+        first_line_indent=False,
     )
     doc.add_heading("References", level=1)
     _add_mendeley_bibliography(doc, REFERENCES)
