@@ -11,7 +11,9 @@ article/qa_*/
 article/*render*.pdf
 article/*
 !article/Article09_QMI_Submission.docx
+!article/Article09_QMI_LaTeX_Submission.zip
 !article/render_report.json
 models/*
 !models/Article09_Models.zip
+templates/
 
