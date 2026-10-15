@@ -75,7 +75,7 @@ pd.DataFrame({
 })
 """
         ),
-        _markdown("## Figure 1 Experimental pipeline"),
+        _markdown("## Figure 2 Experimental pipeline"),
         _code(
             """
 drawio_source = FIG / 'figure_01_pipeline.drawio'
@@ -192,11 +192,13 @@ fig.tight_layout(); save_figure(fig,'figure_05_representation_geometry'); plt.sh
 ranked = (validation[validation.reducer!='full384']
           .groupby(['dataset','reducer','head'],as_index=False).macro_f1.mean()
           .sort_values(['dataset','macro_f1'],ascending=[True,False]).groupby('dataset').head(1))
-fig = plt.figure(figsize=(12.0,8.2))
-grid = fig.add_gridspec(2,2,hspace=0.32,wspace=0.22)
-axes = [fig.add_subplot(grid[0,0]), fig.add_subplot(grid[0,1]), fig.add_subplot(grid[1,:])]
 selected_runs = []
-for ax,(_,choice) in zip(axes,ranked.iterrows()):
+figure_stems = {
+    'cifar10': 'figure_06a_confusion_cifar10',
+    'eurosat': 'figure_06b_confusion_eurosat',
+    'pathmnist': 'figure_06c_confusion_pathmnist',
+}
+for _,choice in ranked.iterrows():
     candidates = validation[(validation['dataset']==choice['dataset'])&(validation['reducer']==choice['reducer'])&(validation['head']==choice['head'])].copy()
     representative_index = (candidates['macro_f1']-candidates['macro_f1'].mean()).abs().idxmin()
     seed_row = candidates.loc[representative_index]
@@ -204,12 +206,14 @@ for ax,(_,choice) in zip(axes,ranked.iterrows()):
     matrix = confusion_matrix(pred.true_label,pred.predicted_label,normalize='true')
     # Display every normalized cell, including 0.00, so the published matrix is complete.
     annotations = np.vectorize(lambda value: f'{value:.2f}')(matrix)
-    sns.heatmap(matrix,annot=annotations,fmt='',annot_kws={'fontsize':7.0},cmap='Blues',vmin=0,vmax=1,
-                linewidths=.35,linecolor='white',square=True,ax=ax,cbar=ax is axes[-1])
-    ax.set_title(f"{choice['dataset']}: {choice['reducer']} + {choice['head']}"); ax.set_xlabel('Predicted'); ax.set_ylabel('True')
+    fig, ax = plt.subplots(figsize=(6.2,5.4))
+    sns.heatmap(matrix,annot=annotations,fmt='',annot_kws={'fontsize':8.0},cmap='Blues',vmin=0,vmax=1,
+                linewidths=.40,linecolor='white',square=True,ax=ax,cbar=True,
+                cbar_kws={'shrink':0.82,'pad':0.025})
+    ax.set_xlabel('Predicted'); ax.set_ylabel('True')
+    fig.subplots_adjust(top=0.98,bottom=0.12,left=0.12,right=0.93)
+    save_figure(fig,figure_stems[choice['dataset']]); plt.show()
     selected_runs.append(seed_row['run_id'])
-fig.suptitle('Normalized test confusion matrices for validation-selected configurations',fontsize=12.5,weight='bold',y=0.995)
-fig.subplots_adjust(top=0.94,bottom=0.07,left=0.07,right=0.93); save_figure(fig,'figure_06_confusion_matrices'); plt.show()
 selected_runs
 """
         ),

@@ -787,7 +787,24 @@ def build_manuscript(output: Path) -> None:
         "Distance preservation, neighborhood trustworthiness, Fisher separation, and silhouette score were computed on the fixed validation subset. Their association with VQC macro-F1 indicates whether circuit behavior tracks the geometry delivered by the reducer rather than the reducer label alone.",
     )
     _add_full_width_figure(doc, "figure_05_representation_geometry", "Figure 5 Representation geometry in relation to VQC performance")
-    _add_full_width_figure(doc, "figure_06_confusion_matrices", "Figure 6 Row-normalized test confusion matrices selected without test-performance access; every cell, including 0.00 values, is generated from prediction-level notebook outputs")
+    _add_full_width_figure(
+        doc,
+        "figure_06a_confusion_cifar10",
+        "Figure 6a Row-normalized CIFAR-10 test confusion matrix for validation-selected SLP-6 with logistic regression",
+        width=5.45,
+    )
+    _add_full_width_figure(
+        doc,
+        "figure_06b_confusion_eurosat",
+        "Figure 6b Row-normalized EuroSAT test confusion matrix for validation-selected SLP-6 with logistic regression",
+        width=5.45,
+    )
+    _add_full_width_figure(
+        doc,
+        "figure_06c_confusion_pathmnist",
+        "Figure 6c Row-normalized PathMNIST test confusion matrix for validation-selected SLP-6 with RBF-SVM",
+        width=5.45,
+    )
     _add_full_width_figure(doc, "figure_07_calibration", "Figure 7 Reliability diagrams for validation-selected configurations")
 
     doc.add_heading("3.3 Runtime", level=2)

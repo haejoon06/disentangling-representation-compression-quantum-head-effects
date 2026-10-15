@@ -57,14 +57,16 @@ CITATIONS: dict[str, list[str]] = {
 
 
 FIGURES = {
-    1: "figure_02_dataset_samples.png",
-    2: "figure_01_pipeline.png",
-    3: "figure_03_macro_f1_heatmap.png",
-    4: "figure_04_compression_and_head_gaps.png",
-    5: "figure_05_representation_geometry.png",
-    6: "figure_06_confusion_matrices.png",
-    7: "figure_07_calibration.png",
-    8: "figure_08_runtime.png",
+    "1": "figure_02_dataset_samples.png",
+    "2": "figure_01_pipeline.png",
+    "3": "figure_03_macro_f1_heatmap.png",
+    "4": "figure_04_compression_and_head_gaps.png",
+    "5": "figure_05_representation_geometry.png",
+    "6a": "figure_06a_confusion_cifar10.png",
+    "6b": "figure_06b_confusion_eurosat.png",
+    "6c": "figure_06c_confusion_pathmnist.png",
+    "7": "figure_07_calibration.png",
+    "8": "figure_08_runtime.png",
 }
 
 
@@ -234,9 +236,9 @@ def table_latex(table: Table, caption: str, number: int) -> str:
     return "\n".join(lines)
 
 
-def figure_latex(caption: str, number: int) -> str:
-    caption_text = re.sub(r"^Figure\s+\d+\s+", "", caption).strip()
-    width = "0.98\\textwidth" if number in {1, 2, 6} else "0.92\\textwidth"
+def figure_latex(caption: str, number: str) -> str:
+    caption_text = re.sub(r"^Figure\s+\d+[a-z]?\s+", "", caption).strip()
+    width = "0.76\\textwidth" if number in {"6a", "6b", "6c"} else "0.98\\textwidth" if number in {"1", "2"} else "0.92\\textwidth"
     return "\n".join(
         [
             r"\begin{figure*}[htbp]",
@@ -321,9 +323,9 @@ def build_tex() -> str:
             if text.startswith("Table "):
                 pending_table_caption = text
                 continue
-            figure_match = re.match(r"^Figure\s+(\d+)\s+", text)
+            figure_match = re.match(r"^Figure\s+(\d+[a-z]?)\s+", text)
             if figure_match:
-                lines.append(figure_latex(text, int(figure_match.group(1))))
+                lines.append(figure_latex(text, figure_match.group(1)))
                 continue
             rendered = (
                 declaration_paragraph(text)
@@ -395,7 +397,7 @@ def main() -> None:
         "Main file: manuscript.tex\n"
         "Class: sn-jnl.cls\n"
         "Reference style: sn-mathphys-ay.bst (author-year, as required by QMI)\n"
-        "Figures: figures/Fig1.png through figures/Fig8.png\n"
+        "Figures: figures/Fig1.png through figures/Fig8.png, with Fig6a.png through Fig6c.png as separate confusion matrices\n"
         "Editable/vector figure sources: matching SVG files and figures/Fig2.drawio\n\n"
         "Compile sequence: pdflatex manuscript; bibtex manuscript; pdflatex manuscript; pdflatex manuscript\n"
         "The submission system should receive the complete ZIP so all editable source files remain available.\n",
