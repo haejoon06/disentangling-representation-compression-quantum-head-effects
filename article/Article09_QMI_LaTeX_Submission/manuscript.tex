@@ -55,7 +55,8 @@ This study asks whether compression or the quantum head is the larger bottleneck
 \centering
 \caption{Related methodological streams and the controls used in this study}\label{tab:1}
 \scriptsize
-\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabularx}{\textwidth}{@{}>{\hsize=1.30\hsize\raggedright\arraybackslash}X>{\hsize=0.90\hsize\raggedright\arraybackslash}X>{\hsize=0.90\hsize\raggedright\arraybackslash}X>{\hsize=0.90\hsize\raggedright\arraybackslash}X@{}}
 \toprule
 \textbf{Research stream} & \textbf{Typical design} & \textbf{Unresolved issue} & \textbf{Control in this study} \\
 \midrule
@@ -353,7 +354,7 @@ Several boundaries constrain the interpretation. The VQC was evaluated with anal
 In conclusion, this study separates pre-quantum representation loss from quantum-head behavior by crossing four reducers and four matched heads on identical six-dimensional vectors from a frozen self-supervised encoder. Full-space references quantify information lost before the circuit, while parameter parity and paired seeds isolate the downstream comparison. The evidence identifies where the predictive bottleneck occurs under the evaluated protocol without supporting a claim of quantum advantage.
 
 
-\textbf{Supplementary Information.} The supplementary material accompanying this submission contains the executable notebook with stored outputs, configuration files, split and artifact hashes, prediction-level outputs, model checkpoints, environment records, and editable figure sources.
+\textbf{Supplementary Information.} The supplementary reproducibility package accompanying this submission contains the executable notebook with stored outputs, configuration files, protocol and artifact hashes, aggregate validation and test metrics, statistical tables, environment records, source code, and editable figure files. Prediction-level outputs and trained model artifacts are available through the public repository cited in the Code Availability statement.
 
 
 \textbf{Acknowledgements.} The authors have no acknowledgements to declare.
@@ -365,7 +366,7 @@ In conclusion, this study separates pre-quantum representation loss from quantum
 \textbf{Funding.} The authors received no specific funding for this work.
 
 
-\textbf{Data Availability.} CIFAR-10, EuroSAT RGB, and PathMNIST are publicly available from the original repositories cited in the Methods. The exact split manifests, sample identifiers, audit reports, hashes, derived metrics, and prediction-level outputs used in this study are included in the supplementary reproducibility package and are available from the corresponding author.
+\textbf{Data Availability.} CIFAR-10, EuroSAT RGB, and PathMNIST are publicly available from the original repositories cited in the Methods. Dataset audit summaries, protocol hashes, derived metrics, statistical outputs, and the information required to reproduce the evaluated partitions are included in the supplementary reproducibility package and public repository. Prediction-level outputs are available in the public repository cited below.
 
 
 \textbf{Code Availability.} The executable notebook, source code, configuration files, environment records, trained artifacts, split manifests, and prediction-level outputs are publicly available at \url{https://github.com/haejoon06/disentangling-representation-compression-quantum-head-effects}.
@@ -374,9 +375,6 @@ In conclusion, this study separates pre-quantum representation loss from quantum
 \section*{Declarations}
 
 \textbf{Competing Interests.} The authors declare that they have no competing interests.
-
-
-\textbf{Open Access.} The authors request open-access publication under the Creative Commons Attribution 4.0 International License, subject to the journal's publication agreement. This license permits use, sharing, adaptation, distribution, and reproduction with appropriate credit, a link to the license, and an indication of any changes.
 
 
 \bibliography{references}
