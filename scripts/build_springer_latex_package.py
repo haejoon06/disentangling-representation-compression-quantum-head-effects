@@ -13,7 +13,9 @@ from docx.text.paragraph import Paragraph
 
 
 ROOT = Path(r"D:\Quantum")
-DOCX = ROOT / "article" / "Article09_QMI_Submission.docx"
+FINAL_DOCX = ROOT / "article" / "Article09_QMI_Submission_Final_Figures.docx"
+CORRECTED_DOCX = ROOT / "article" / "Article09_QMI_Submission_Complete_CM.docx"
+DOCX = FINAL_DOCX if FINAL_DOCX.exists() else CORRECTED_DOCX if CORRECTED_DOCX.exists() else ROOT / "article" / "Article09_QMI_Submission.docx"
 RIS = ROOT / "references" / "article09_qmi_references.ris"
 TEMPLATE = ROOT / "templates" / "springer-nature-2024" / "sn-article-template"
 PACKAGE = ROOT / "article" / "Article09_QMI_LaTeX_Submission"
